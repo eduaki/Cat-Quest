@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer Cat Ears -->
+    <path
+        android:fillColor="#FFFDF7"
+        android:strokeColor="#5D4037"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round"
+        android:pathData="M 33,48 L 27,27 C 29,26 38,30 46,37 Z" />
+    <path
+        android:fillColor="#FFFDF7"
+        android:strokeColor="#5D4037"
+        android:strokeWidth="2.5"
+        android:strokeLineJoin="round"
+        android:pathData="M 75,48 L 81,27 C 79,26 70,30 62,37 Z" />
+
+    <!-- Inner Pink Ears -->
+    <path
+        android:fillColor="#FF80AB"
+        android:pathData="M 35,45 L 30,31 C 33,31 38,34 43,39 Z" />
+    <path
+        android:fillColor="#FF80AB"
+        android:pathData="M 73,45 L 78,31 C 75,31 70,34 65,39 Z" />
+
+    <!-- Cat Head -->
+    <path
+        android:fillColor="#FFFDF7"
+        android:strokeColor="#5D4037"
+        android:strokeWidth="2.5"
+        android:pathData="M 54,34 C 38,34 26,45 26,60 C 26,75 38,82 54,82 C 70,82 82,75 82,60 C 82,45 70,34 54,34 Z" />
+
+    <!-- Cat Cheeks Blush -->
+    <path
+        android:fillColor="#FFCDD2"
+        android:pathData="M 36,65 m -5,0 a 5,3 0 1,0 10,0 a 5,3 0 1,0 -10,0" />
+    <path
+        android:fillColor="#FFCDD2"
+        android:pathData="M 72,65 m -5,0 a 5,3 0 1,0 10,0 a 5,3 0 1,0 -10,0" />
+
+    <!-- Big Sparkly Eyes -->
+    <path
+        android:fillColor="#3E2723"
+        android:pathData="M 42,54 m -4.5,0 a 4.5,5.5 0 1,0 9,0 a 4.5,5.5 0 1,0 -9,0" />
+    <path
+        android:fillColor="#3E2723"
+        android:pathData="M 66,54 m -4.5,0 a 4.5,5.5 0 1,0 9,0 a 4.5,5.5 0 1,0 -9,0" />
+    <!-- Eye Highlights -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 40,51.5 m -1.5,0 a 1.5,1.5 0 1,0 3,0 a 1.5,1.5 0 1,0 -3,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 64,51.5 m -1.5,0 a 1.5,1.5 0 1,0 3,0 a 1.5,1.5 0 1,0 -3,0" />
+
+    <!-- Pink Heart Nose -->
+    <path
+        android:fillColor="#FF4081"
+        android:pathData="M 54,61 C 52,58.5 49.5,59.5 51,62.5 L 54,65 L 57,62.5 C 58.5,59.5 56,58.5 54,61 Z" />
+
+    <!-- W-Mouth -->
+    <path
+        android:strokeColor="#5D4037"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M 54,65 Q 50,70 46,67" />
+    <path
+        android:strokeColor="#5D4037"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M 54,65 Q 58,70 62,67" />
+
+    <!-- Whiskers Left -->
+    <path
+        android:strokeColor="#8D6E63"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M 28,59 L 16,56" />
+    <path
+        android:strokeColor="#8D6E63"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M 28,64 L 15,65" />
+    <path
+        android:strokeColor="#8D6E63"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M 29,69 L 17,73" />
+
+    <!-- Whiskers Right -->
+    <path
+        android:strokeColor="#8D6E63"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M 80,59 L 92,56" />
+    <path
+        android:strokeColor="#8D6E63"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M 80,64 L 93,65" />
+    <path
+        android:strokeColor="#8D6E63"
+        android:strokeWidth="1.6"
+        android:strokeLineCap="round"
+        android:pathData="M 79,69 L 91,73" />
+
+    <!-- Cute Little Paws Peeking Up -->
+    <path
+        android:fillColor="#FFFDF7"
+        android:strokeColor="#5D4037"
+        android:strokeWidth="2.2"
+        android:pathData="M 40,86 C 40,79 48,79 48,86 Z" />
+    <path
+        android:fillColor="#FF80AB"
+        android:pathData="M 44,82 m -2.2,0 a 2.2,1.8 0 1,0 4.4,0 a 2.2,1.8 0 1,0 -4.4,0" />
+
+    <path
+        android:fillColor="#FFFDF7"
+        android:strokeColor="#5D4037"
+        android:strokeWidth="2.2"
+        android:pathData="M 60,86 C 60,79 68,79 68,86 Z" />
+    <path
+        android:fillColor="#FF80AB"
+        android:pathData="M 64,82 m -2.2,0 a 2.2,1.8 0 1,0 4.4,0 a 2.2,1.8 0 1,0 -4.4,0" />
+</vector>

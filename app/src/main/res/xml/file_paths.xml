@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="cat_photos_cache" path="cat_photos/" />
+    <files-path name="cat_photos_internal" path="cat_photos/" />
+    <external-files-path name="cat_photos_external" path="Pictures/" />
+</paths>

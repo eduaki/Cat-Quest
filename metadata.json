@@ -1,0 +1,6 @@
+{
+  "name": "Miau Missões",
+  "description": "App com estética fofa de gatinhos cartoon: calendário de missões diárias com comprovação por fotos, carrossel musical de retrospectiva do mês, mural de fotos compartilhável e notificações personalizadas de carinho e cuidado.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
