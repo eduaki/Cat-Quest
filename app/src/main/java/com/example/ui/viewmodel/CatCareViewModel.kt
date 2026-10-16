@@ -228,12 +228,14 @@ class CatCareViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun updateProfile(name: String, breed: String, favoriteSnack: String) {
+    fun updateProfile(name: String, gender: String, breed: String, favoriteSnack: String, skin: String) {
         viewModelScope.launch {
             val updated = profile.value.copy(
                 name = name,
+                gender = gender,
                 breed = breed,
-                favoriteSnack = favoriteSnack
+                favoriteSnack = favoriteSnack,
+                equippedSkin = skin
             )
             repository.updateProfile(updated)
             // Reschedule alarms with new cat name

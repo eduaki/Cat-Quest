@@ -8,6 +8,7 @@ data class CatProfile(
     @PrimaryKey
     val id: Int = 1,
     val name: String = "Mingau",
+    val gender: String = "Macho", // Macho, Fêmea, Outro
     val breed: String = "Siamês Peludinho",
     val favoriteSnack: String = "Sachê de Salmão",
     val birthday: String = "2024-05-15",
@@ -17,7 +18,7 @@ data class CatProfile(
     val fishCoins: Int = 100, // Starter bonus!
     val pawsCount: Int = 0, // Total missions completed with photo
     val equippedAccessory: String = "NONE", // NONE, BOW, CROWN, TOPHAT, CAP, WITCH, FLOWERS, SUNGLASSES
-    val equippedSkin: String = "WHITE", // WHITE, GINGER, BLACK, SIAMESE, CALICO
+    val equippedSkin: String = "WHITE", // WHITE, GINGER, BLACK, SIAMESE, CALICO, TUXEDO, TABBY, SPOTTED_GRAY, SPOTTED_BROWN, etc.
     val equippedTheme: String = "DEFAULT", // DEFAULT, SAKURA, MINT_JARDIM, NIGHT_STARS
     val unlockedItems: String = "NONE,WHITE,DEFAULT" // Comma separated list of unlocked IDs
 ) {
@@ -60,11 +61,17 @@ object RewardCatalog {
     )
 
     val skins = listOf(
-        ShopRewardItem("WHITE", "Algodão Doce (Branco)", RewardType.SKIN, 0, "⚪", "Pelagem macia como neve"),
-        ShopRewardItem("GINGER", "Laranjinha Tigrado", RewardType.SKIN, 80, "🟠", "Alegre, sapeca e cheio de energia"),
-        ShopRewardItem("BLACK", "Panterinha da Sorte", RewardType.SKIN, 120, "⚫", "Pelos negros brilhantes e elegantes"),
-        ShopRewardItem("SIAMESE", "Siamês Charmoso", RewardType.SKIN, 160, "🟤", "Máscara e orelhas escuras clássicas"),
-        ShopRewardItem("CALICO", "Calico da Sorte", RewardType.SKIN, 200, "🐱", "Tricolor que traz muita fortuna")
+        ShopRewardItem("WHITE", "Branco Algodão", RewardType.SKIN, 0, "⚪", "Pelagem macia como neve"),
+        ShopRewardItem("GINGER", "Laranja Tigrado", RewardType.SKIN, 0, "🟠", "Alegre, sapeca e cheio de energia"),
+        ShopRewardItem("BLACK", "Preto Pantera", RewardType.SKIN, 0, "⚫", "Pelos negros brilhantes e elegantes"),
+        ShopRewardItem("SIAMESE", "Siamês Charmoso", RewardType.SKIN, 0, "🟤", "Máscara e orelhas escuras clássicas"),
+        ShopRewardItem("CALICO", "Calico Tricolor", RewardType.SKIN, 0, "🐱", "Tricolor que traz muita fortuna"),
+        ShopRewardItem("TUXEDO", "Frajola Elegante", RewardType.SKIN, 0, "👔", "Preto com peito e patinhas brancas"),
+        ShopRewardItem("TABBY", "Cinza Tigrado", RewardType.SKIN, 0, "🩶", "Clássico riscadinho cinza"),
+        ShopRewardItem("SPOTTED_GRAY", "Manchas de Cinza", RewardType.SKIN, 0, "🌫️", "Branco com manchas cinzas"),
+        ShopRewardItem("SPOTTED_BROWN", "Manchas Chocolate", RewardType.SKIN, 0, "🤎", "Branco com manchas marrons"),
+        ShopRewardItem("SPOTTED_BLACK", "Vaca Malhada", RewardType.SKIN, 0, "🐄", "Branco com grandes manchas pretas"),
+        ShopRewardItem("SPOTTED_ORANGE", "Manchas de Fogo", RewardType.SKIN, 0, "🔥", "Branco com manchas alaranjadas")
     )
 
     val themes = listOf(

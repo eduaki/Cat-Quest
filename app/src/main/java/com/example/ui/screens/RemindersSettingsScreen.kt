@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,10 +40,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -65,6 +72,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.models.ReminderConfig
+import com.example.data.models.RewardCatalog
 import com.example.notifications.CatNotificationHelper
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
@@ -82,6 +90,7 @@ import com.example.ui.theme.CatYellow
 import com.example.ui.viewmodel.CatCareViewModel
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RemindersSettingsScreen(
     viewModel: CatCareViewModel,
@@ -116,9 +125,13 @@ fun RemindersSettingsScreen(
     }
 
     var petName by remember(profile.name) { mutableStateOf(profile.name) }
+    var petGender by remember(profile.gender) { mutableStateOf(profile.gender) }
     var petBreed by remember(profile.breed) { mutableStateOf(profile.breed) }
     var petSnack by remember(profile.favoriteSnack) { mutableStateOf(profile.favoriteSnack) }
+    var petSkin by remember(profile.equippedSkin) { mutableStateOf(profile.equippedSkin) }
+    
     var isEditingProfile by remember { mutableStateOf(false) }
+    var genderExpanded by remember { mutableStateOf(false) }
 
     val activeSchedules = remember(config) {
         CatNotificationHelper.getFormattedActiveSchedules(config)
@@ -166,7 +179,7 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Permission Request Banner (Android 13+)
+        // ... (Permission Banner and Active Schedules parts remain the same)
         if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             item {
                 Card(
@@ -203,7 +216,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Active Scheduled Alarms Status Card
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -287,7 +299,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Local Notification Manager: Personalized Affection & Encouragement Section
         item {
             CatAffectionNotificationManagerSection(
                 messages = affectionMessages,
@@ -307,7 +318,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Friendly Tone Selector
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -355,7 +365,6 @@ fun RemindersSettingsScreen(
                         }
                     }
 
-                    // Sample preview of message
                     val sampleMessage = remember(config.friendlyTone, profile.name) {
                         CatNotificationHelper.getRandomFriendlyMessage(
                             profile.name,
@@ -390,7 +399,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Sound & Vibration Preferences
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -442,7 +450,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Daily Reminder Slots
         item {
             Text(
                 text = "Horários dos Lembretes Diários ⏰",
@@ -453,7 +460,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Morning Slot
         item {
             ReminderSlotCard(
                 title = "Manhã: Água Limpa & Comidinha",
@@ -470,7 +476,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Afternoon Slot
         item {
             ReminderSlotCard(
                 title = "Tarde: Brincadeira & Pelos",
@@ -487,7 +492,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Evening Slot
         item {
             ReminderSlotCard(
                 title = "Noite: Caixinha de Areia & Mimos",
@@ -504,7 +508,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Weekly Missions Progress Bar Chart (D3 / Recharts inside Compose)
         item {
             WeekMissionsBarChart(
                 weekData = weekData,
@@ -536,7 +539,7 @@ fun RemindersSettingsScreen(
                         OutlinedButton(
                             onClick = {
                                 if (isEditingProfile) {
-                                    viewModel.updateProfile(petName, petBreed, petSnack)
+                                    viewModel.updateProfile(petName, petGender, petBreed, petSnack, petSkin)
                                 }
                                 isEditingProfile = !isEditingProfile
                             },
@@ -546,9 +549,10 @@ fun RemindersSettingsScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     if (isEditingProfile) {
+                        // Edit Mode
                         OutlinedTextField(
                             value = petName,
                             onValueChange = { petName = it },
@@ -557,16 +561,48 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        
+                        // Gender Selector
+                        ExposedDropdownMenuBox(
+                            expanded = genderExpanded,
+                            onExpandedChange = { genderExpanded = !genderExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = petGender,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Gênero") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = genderExpanded,
+                                onDismissRequest = { genderExpanded = false }
+                            ) {
+                                listOf("Macho", "Fêmea", "Outro").forEach { gender ->
+                                    DropdownMenuItem(
+                                        text = { Text(gender) },
+                                        onClick = {
+                                            petGender = gender
+                                            genderExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
                             value = petBreed,
                             onValueChange = { petBreed = it },
-                            label = { Text("Raça / Tipo de Pelagem") },
+                            label = { Text("Raça / Tipo") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
                             value = petSnack,
                             onValueChange = { petSnack = it },
@@ -575,23 +611,88 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Skin Selector
+                        Text(
+                            text = "Escolha a Pelagem (Cores e Manchas):",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = CatBrownText,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(RewardCatalog.skins) { skinItem ->
+                                val isSelected = petSkin == skinItem.id
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .clickable { petSkin = skinItem.id }
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(if (isSelected) CatPeachLight else Color(0xFFF5F5F5))
+                                            .border(
+                                                width = if (isSelected) 2.dp else 1.dp,
+                                                color = if (isSelected) CatPeachPrimary else Color.Transparent,
+                                                shape = RoundedCornerShape(12.dp)
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CartoonCatFace(size = 48.dp, skinType = skinItem.id)
+                                    }
+                                    Text(
+                                        text = skinItem.name.split(" ")[0], // Show first word
+                                        fontSize = 10.sp,
+                                        color = if (isSelected) CatPeachPrimary else CatBrownMuted,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+
                     } else {
-                        Text(
-                            text = "Nome: ${profile.name}",
-                            fontWeight = FontWeight.SemiBold,
-                            color = CatPeachPrimary,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "Pelagem: ${profile.breed}",
-                            color = CatBrownMuted,
-                            fontSize = 13.sp
-                        )
-                        Text(
-                            text = "Petisco Preferido: ${profile.favoriteSnack}",
-                            color = CatBrownMuted,
-                            fontSize = 13.sp
-                        )
+                        // View Mode
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CartoonCatFace(
+                                size = 80.dp,
+                                skinType = profile.equippedSkin,
+                                accessoryType = profile.equippedAccessory
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    text = "Nome: ${profile.name}",
+                                    fontWeight = FontWeight.Bold,
+                                    color = CatPeachPrimary,
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = "Gênero: ${profile.gender}",
+                                    color = CatBrownText,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Raça: ${profile.breed}",
+                                    color = CatBrownMuted,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Petisco: ${profile.favoriteSnack}",
+                                    color = CatBrownMuted,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
