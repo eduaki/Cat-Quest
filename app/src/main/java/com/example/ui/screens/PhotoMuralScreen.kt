@@ -25,6 +25,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -63,6 +66,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.data.models.CatMission
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
+import com.example.ui.components.MissionCategoryIcon
 import com.example.ui.theme.CatBrownMuted
 import com.example.ui.theme.CatBrownText
 import com.example.ui.theme.CatPeachLight
@@ -126,17 +130,17 @@ fun PhotoMuralScreen(
                                 CartoonPawPrint(size = 22.dp, color = CatPeachPrimary)
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "Mural de Lembranças 🖼️",
+                                    text = "Mural de Lembranças",
                                     style = MaterialTheme.typography.titleLarge,
                                     fontWeight = FontWeight.Bold,
                                     color = CatBrownText
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
-                                CartoonPawPrint(size = 22.dp, color = CatPeachPrimary)
+                                Icon(Icons.Default.Collections, contentDescription = null, tint = CatPeachPrimary, modifier = Modifier.size(24.dp))
                             }
 
                             Text(
-                                text = "Álbum de carinho e cuidados com o ${profile.name} 🐱",
+                                text = "Álbum de carinho e cuidados com o ${profile.name}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = CatPeachPrimary,
                                 modifier = Modifier.padding(top = 2.dp)
@@ -202,7 +206,7 @@ fun PhotoMuralScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Tire fotos das missões diárias para preencher o mural de amor do ${profile.name}! 📸✨",
+                                text = "Tire fotos das missões diárias para preencher o mural de amor do ${profile.name}!",
                                 fontSize = 13.sp,
                                 color = CatBrownMuted,
                                 textAlign = TextAlign.Center
@@ -213,7 +217,9 @@ fun PhotoMuralScreen(
                                 colors = ButtonDefaults.buttonColors(containerColor = CatPeachPrimary),
                                 shape = RoundedCornerShape(14.dp)
                             ) {
-                                Text("Ir para as Missões Diárias 🐾")
+                                Icon(Icons.Default.Pets, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Ir para as Missões Diárias")
                             }
                         }
                     }
@@ -274,13 +280,20 @@ fun PhotoMuralScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "${mission.getCategoryEnum().iconEmoji} ${mission.title}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = CatBrownText,
-                            modifier = Modifier.weight(1f)
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                            MissionCategoryIcon(
+                                category = mission.getCategoryEnum(),
+                                modifier = Modifier.size(22.dp),
+                                tint = CatPeachPrimary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = mission.title,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = CatBrownText
+                            )
+                        }
                         IconButton(onClick = { selectedPhotoDetail = null }) {
                             Icon(Icons.Default.Close, contentDescription = "Fechar")
                         }
@@ -415,14 +428,22 @@ private fun MuralPolaroidCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Caption
-            Text(
-                text = "${mission.getCategoryEnum().iconEmoji} ${mission.title}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                color = CatBrownText,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                MissionCategoryIcon(
+                    category = mission.getCategoryEnum(),
+                    modifier = Modifier.size(16.dp),
+                    tint = CatPeachPrimary
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = mission.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    color = CatBrownText,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
             Text(
                 text = DateUtils.formatDayMonth(mission.date),

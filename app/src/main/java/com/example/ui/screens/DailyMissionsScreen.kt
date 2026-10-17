@@ -30,10 +30,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -83,6 +89,8 @@ import com.example.data.models.MissionCategory
 import com.example.ui.camera.CatCameraScreen
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
+import com.example.ui.components.MissionCategoryIcon
+import com.example.ui.components.getCategoryIcon
 import com.example.ui.theme.CatBrownMuted
 import com.example.ui.theme.CatBrownText
 import com.example.ui.theme.CatMint
@@ -121,12 +129,10 @@ fun DailyMissionsScreen(
     var previewPhotoPath by remember { mutableStateOf<String?>(null) }
     var activeCameraMission by remember { mutableStateOf<CatMission?>(null) }
 
-    // Notificar quando a câmera for aberta ou fechada
     LaunchedEffect(activeCameraMission) {
         onCameraStateChanged(activeCameraMission != null)
     }
 
-    // Camera launcher setup
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -140,13 +146,12 @@ fun DailyMissionsScreen(
         }
     }
 
-    // Photo picker launcher (Gallery)
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        if (uri != null && selectedMissionForPhoto != null) {
+        if (uri != null) {
             val savedPath = PhotoManager.saveImageFromUri(context, uri)
-            if (savedPath != null) {
+            if (savedPath != null && selectedMissionForPhoto != null) {
                 viewModel.completeMissionWithPhoto(selectedMissionForPhoto!!, savedPath)
             }
             showPhotoOptionsDialog = false
@@ -161,7 +166,6 @@ fun DailyMissionsScreen(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 96.dp)
         ) {
-            // Header Section
             item {
                 HeaderBanner(
                     catName = profile.name,
@@ -180,7 +184,6 @@ fun DailyMissionsScreen(
                 )
             }
 
-            // Title section
             item {
                 Row(
                     modifier = Modifier
@@ -190,12 +193,16 @@ fun DailyMissionsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(
-                            text = "Missões Diárias de Cuidado 🐾",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Missões Diárias de Cuidado",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            CartoonPawPrint(size = 18.dp)
+                        }
                         Text(
                             text = "Tire uma foto para comprovar cada missão!",
                             style = MaterialTheme.typography.bodySmall,
@@ -205,7 +212,6 @@ fun DailyMissionsScreen(
                 }
             }
 
-            // Missions list
             items(missions, key = { it.id }) { mission ->
                 MissionCardItem(
                     mission = mission,
@@ -247,7 +253,6 @@ fun DailyMissionsScreen(
             }
         }
 
-        // Floating Action Button to add custom mission
         FloatingActionButton(
             onClick = { showAddDialog = true },
             modifier = Modifier
@@ -269,17 +274,16 @@ fun DailyMissionsScreen(
         }
     }
 
-    // Photo Selection Dialog (Camera, Gallery, or Instant Cartoon Stamp)
     if (showPhotoOptionsDialog && selectedMissionForPhoto != null) {
         val mission = selectedMissionForPhoto!!
         AlertDialog(
             onDismissRequest = { showPhotoOptionsDialog = false },
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    CartoonPawPrint(size = 24.dp)
+                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = CatPeachPrimary)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Comprovar Missão 📸",
+                        text = "Comprovar Missão",
                         fontWeight = FontWeight.Bold,
                         color = CatBrownText
                     )
@@ -310,7 +314,7 @@ fun DailyMissionsScreen(
                     ) {
                         Icon(Icons.Default.CameraAlt, contentDescription = null)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Abrir Câmera do Gatinho (CameraX)")
+                        Text("Abrir Câmera do Gatinho")
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -331,7 +335,6 @@ fun DailyMissionsScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Instant cartoon stamp badge (especially useful for emulators or instant fun!)
                     Button(
                         onClick = {
                             viewModel.completeMissionWithInstantProof(context, mission)
@@ -341,7 +344,9 @@ fun DailyMissionsScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = CatMint),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("✨ Gerar Selo Mágico Fofo")
+                        Icon(Icons.Default.AutoAwesome, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Gerar Selo Mágico Fofo")
                     }
                 }
             },
@@ -354,7 +359,6 @@ fun DailyMissionsScreen(
         )
     }
 
-    // Celebration dialog when mission is completed
     if (celebrationMission != null) {
         val completed = celebrationMission!!
         Dialog(onDismissRequest = { viewModel.dismissCelebration() }) {
@@ -370,12 +374,18 @@ fun DailyMissionsScreen(
                 ) {
                     CartoonCatFace(size = 90.dp)
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = "🐾 MISSÃO APROVADA! 🐾",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black,
-                        color = CatPeachPrimary
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        CartoonPawPrint(size = 20.dp)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "MISSÃO APROVADA!",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = CatPeachPrimary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        CartoonPawPrint(size = 20.dp)
+                    }
                     Text(
                         text = completed.title,
                         style = MaterialTheme.typography.bodyMedium,
@@ -409,7 +419,6 @@ fun DailyMissionsScreen(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    // Score & Points Calculation Breakdown Card
                     Surface(
                         shape = RoundedCornerShape(18.dp),
                         color = Color(0xFFFFF9F5),
@@ -420,12 +429,18 @@ fun DailyMissionsScreen(
                             modifier = Modifier.padding(12.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = "⭐ Cálculo da Recompensa ⭐",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = CatPeachPrimary
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = CatYellow, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Cálculo da Recompensa",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = CatPeachPrimary
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(Icons.Default.Star, contentDescription = null, tint = CatYellow, modifier = Modifier.size(14.dp))
+                            }
                             Spacer(modifier = Modifier.height(6.dp))
 
                             Row(
@@ -474,12 +489,16 @@ fun DailyMissionsScreen(
                                     fontWeight = FontWeight.Bold,
                                     color = CatBrownText
                                 )
-                                Text(
-                                    text = "+${lastScoreResult?.totalPoints ?: (if (completed.pointsEarned > 0) completed.pointsEarned else completed.getCategoryEnum().basePoints)} pts ⭐",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = CatPeachPrimary
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "+${lastScoreResult?.totalPoints ?: (if (completed.pointsEarned > 0) completed.pointsEarned else completed.getCategoryEnum().basePoints)} pts",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = CatPeachPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(2.dp))
+                                    Icon(Icons.Default.Star, contentDescription = null, tint = CatYellow, modifier = Modifier.size(12.dp))
+                                }
                             }
 
                             Row(
@@ -487,16 +506,20 @@ fun DailyMissionsScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Peixinhos Dourados:",
+                                    text = "Peixinhos Adquiridos:",
                                     fontSize = 12.sp,
                                     color = CatBrownMuted
                                 )
-                                Text(
-                                    text = "+${lastScoreResult?.fishCoinsAwarded ?: (if (completed.fishEarned > 0) completed.fishEarned else completed.getCategoryEnum().fishReward)} 🐟",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = CatBrownText
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "+${lastScoreResult?.fishCoinsAwarded ?: (if (completed.fishEarned > 0) completed.fishEarned else completed.getCategoryEnum().fishReward)}",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = CatBrownText
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(Icons.Default.MonetizationOn, contentDescription = null, tint = CatYellow, modifier = Modifier.size(14.dp))
+                                }
                             }
                         }
                     }
@@ -508,14 +531,20 @@ fun DailyMissionsScreen(
                             color = CatYellow.copy(alpha = 0.4f),
                             border = androidx.compose.foundation.BorderStroke(1.dp, CatYellow)
                         ) {
-                            Text(
-                                text = "🎉 SUBIU DE NÍVEL! Agora você é ${lastScoreResult?.levelTitle}!",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Black,
-                                color = CatBrownText,
+                            Row(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                textAlign = TextAlign.Center
-                            )
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "SUBIU DE NÍVEL! Agora você é ${lastScoreResult?.levelTitle}!",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = CatBrownText,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
 
@@ -538,14 +567,15 @@ fun DailyMissionsScreen(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth().testTag("celebration_continue_button")
                     ) {
-                        Text("Continuar Cuidando! 💖", fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.Favorite, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Continuar Cuidando!", fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
     }
 
-    // Photo preview full-screen dialog
     if (previewPhotoPath != null) {
         Dialog(onDismissRequest = { previewPhotoPath = null }) {
             Card(
@@ -578,7 +608,6 @@ fun DailyMissionsScreen(
         }
     }
 
-    // Add Custom Mission Dialog
     if (showAddDialog) {
         AddCustomMissionDialog(
             onDismiss = { showAddDialog = false },
@@ -589,7 +618,6 @@ fun DailyMissionsScreen(
         )
     }
 
-    // CameraX In-App Viewfinder
     if (activeCameraMission != null) {
         CatCameraScreen(
             mission = activeCameraMission!!,
@@ -663,29 +691,36 @@ private fun HeaderBanner(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
-                            Text(
-                                text = "Gatinho $catName 🐱",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = CatBrownText
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Gatinho $catName",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = CatBrownText
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(Icons.Default.Pets, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(16.dp))
+                            }
                             Text(
                                 text = DateUtils.formatDayMonth(dateStr),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = CatPeachPrimary,
                                 fontWeight = FontWeight.SemiBold
                             )
-                            Text(
-                                text = "⭐ $totalScore pts • Nível $level",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = CatBrownMuted,
-                                fontWeight = FontWeight.Medium
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = CatYellow, modifier = Modifier.size(14.dp))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "$totalScore pts • Nível $level",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = CatBrownMuted,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
                         }
                     }
 
                     Column(horizontalAlignment = Alignment.End) {
-                        // Streak Badge
                         Surface(
                             shape = RoundedCornerShape(14.dp),
                             color = CatPinkLight.copy(alpha = 0.7f),
@@ -695,7 +730,7 @@ private fun HeaderBanner(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "🔥", fontSize = 14.sp)
+                                Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = CatPink, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "$streak d",
@@ -708,7 +743,6 @@ private fun HeaderBanner(
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        // Reminders Settings Button
                         Surface(
                             shape = RoundedCornerShape(14.dp),
                             color = CatPeachLight.copy(alpha = 0.5f),
@@ -719,7 +753,7 @@ private fun HeaderBanner(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "🔔", fontSize = 14.sp)
+                                Icon(Icons.Default.Notifications, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "Avisos",
@@ -732,7 +766,6 @@ private fun HeaderBanner(
 
                         Spacer(modifier = Modifier.height(6.dp))
 
-                        // Golden Fish Shop Button
                         Surface(
                             shape = RoundedCornerShape(14.dp),
                             color = CatYellow.copy(alpha = 0.35f),
@@ -743,7 +776,7 @@ private fun HeaderBanner(
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "🐟", fontSize = 14.sp)
+                                Icon(Icons.Default.MonetizationOn, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "$fishCoins",
@@ -758,7 +791,6 @@ private fun HeaderBanner(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                // Level Rank Chip
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = Color.White.copy(alpha = 0.8f),
@@ -786,7 +818,6 @@ private fun HeaderBanner(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Progress Indicator
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -851,7 +882,6 @@ private fun MissionCardItem(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Category Emoji Avatar
                 Box(
                     modifier = Modifier
                         .size(46.dp)
@@ -862,9 +892,10 @@ private fun MissionCardItem(
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = mission.getCategoryEnum().iconEmoji,
-                        fontSize = 24.sp
+                    MissionCategoryIcon(
+                        category = mission.getCategoryEnum(),
+                        tint = if (mission.isCompleted) CatMint else CatPeachPrimary,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -890,17 +921,29 @@ private fun MissionCardItem(
                             shape = RoundedCornerShape(8.dp),
                             color = if (mission.isCompleted) CatMint.copy(alpha = 0.15f) else CatYellow.copy(alpha = 0.3f)
                         ) {
-                            Text(
-                                text = if (mission.isCompleted) {
-                                    "+${if (mission.pointsEarned > 0) mission.pointsEarned else mission.getCategoryEnum().basePoints} pts"
-                                } else {
-                                    "+${mission.getCategoryEnum().basePoints} pts • ${mission.getCategoryEnum().fishReward} 🐟"
-                                },
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (mission.isCompleted) CatMint else CatBrownText,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = if (mission.isCompleted) {
+                                        "+${if (mission.pointsEarned > 0) mission.pointsEarned else mission.getCategoryEnum().basePoints} pts"
+                                    } else {
+                                        "+${mission.getCategoryEnum().basePoints} pts • ${mission.getCategoryEnum().fishReward} "
+                                    },
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (mission.isCompleted) CatMint else CatBrownText
+                                )
+                                if (!mission.isCompleted) {
+                                    Icon(
+                                        Icons.Default.MonetizationOn,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(10.dp),
+                                        tint = CatBrownText
+                                    )
+                                }
+                            }
                         }
                     }
                     Text(
@@ -926,7 +969,6 @@ private fun MissionCardItem(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Completed or Pending State
             if (mission.isCompleted) {
                 Row(
                     modifier = Modifier
@@ -957,12 +999,16 @@ private fun MissionCardItem(
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "Comprovado com Foto! 🐾",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
-                                color = CatMint
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Comprovado com Foto!",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = CatMint
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                CartoonPawPrint(size = 12.dp, color = CatMint)
+                            }
                         }
                         Text(
                             text = mission.catComment,
@@ -993,7 +1039,7 @@ private fun MissionCardItem(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Tirar Foto de Prova 📸",
+                        text = "Tirar Foto de Prova",
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp
                     )
@@ -1017,11 +1063,15 @@ private fun AddCustomMissionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(
-                text = "Nova Missão do Gatinho 🐾",
-                fontWeight = FontWeight.Bold,
-                color = CatBrownText
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Nova Missão do Gatinho",
+                    fontWeight = FontWeight.Bold,
+                    color = CatBrownText
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                CartoonPawPrint(size = 20.dp)
+            }
         },
         text = {
             Column {
@@ -1054,10 +1104,13 @@ private fun AddCustomMissionDialog(
                     onExpandedChange = { expanded = !expanded }
                 ) {
                     OutlinedTextField(
-                        value = "${selectedCategory.iconEmoji} ${selectedCategory.displayName}",
+                        value = selectedCategory.displayName,
                         onValueChange = {},
                         readOnly = true,
                         label = { Text("Categoria") },
+                        leadingIcon = {
+                            MissionCategoryIcon(category = selectedCategory, modifier = Modifier.size(20.dp), tint = CatPeachPrimary)
+                        },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
@@ -1068,7 +1121,13 @@ private fun AddCustomMissionDialog(
                     ) {
                         MissionCategory.entries.forEach { cat ->
                             DropdownMenuItem(
-                                text = { Text("${cat.iconEmoji} ${cat.displayName}") },
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(getCategoryIcon(cat), contentDescription = null, modifier = Modifier.size(18.dp), tint = CatPeachPrimary)
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text(cat.displayName)
+                                    }
+                                },
                                 onClick = {
                                     selectedCategory = cat
                                     expanded = false

@@ -30,11 +30,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -120,7 +122,7 @@ fun RemindersSettingsScreen(
     ) { isGranted ->
         hasNotificationPermission = isGranted
         if (isGranted) {
-            Toast.makeText(context, "Lembretes fofos ativados com sucesso! 🐾", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Lembretes ativados com sucesso!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -163,12 +165,16 @@ fun RemindersSettingsScreen(
                     )
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
-                        Text(
-                            text = "Lembretes & Mensagens 🔔",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Lembretes & Mensagens",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(Icons.Default.Notifications, contentDescription = null, tint = CatPeachPrimary)
+                        }
                         Text(
                             text = "Notificações carinhosas e avisos de missões do seu gato!",
                             style = MaterialTheme.typography.bodySmall,
@@ -179,7 +185,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // ... (Permission Banner and Active Schedules parts remain the same)
         if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             item {
                 Card(
@@ -190,7 +195,7 @@ fun RemindersSettingsScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "🐾", fontSize = 24.sp)
+                            CartoonPawPrint(size = 24.dp)
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = "Permissão de Notificação Necessária",
@@ -209,7 +214,9 @@ fun RemindersSettingsScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = CatPeachPrimary),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Autorizar Lembretes Fofos 🐾", fontWeight = FontWeight.Bold)
+                            Icon(Icons.Default.NotificationsActive, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Autorizar Lembretes", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -249,13 +256,24 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(8.dp),
                             color = if (activeSchedules.isNotEmpty()) CatMint.copy(alpha = 0.2f) else Color(0xFFFFECE0)
                         ) {
-                            Text(
-                                text = if (activeSchedules.isNotEmpty()) "⏰ ${activeSchedules.size} Ativos" else "Inativo",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (activeSchedules.isNotEmpty()) Icons.Default.AccessTime else Icons.Default.Notifications,
+                                    contentDescription = null,
+                                    tint = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (activeSchedules.isNotEmpty()) "${activeSchedules.size} Ativos" else "Inativo",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary
+                                )
+                            }
                         }
                     }
 
@@ -326,12 +344,16 @@ fun RemindersSettingsScreen(
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Tom das Mensagens do Bichano 😸",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = CatBrownText
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Tom das Mensagens do Bichano",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = CatBrownText
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Default.Pets, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(18.dp))
+                    }
                     Text(
                         text = "Personalize o jeitinho que o gato fala com você:",
                         fontSize = 12.sp,
@@ -344,18 +366,24 @@ fun RemindersSettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val tones = listOf(
-                            Triple("CARINHOSO", "Carinhoso 💖", "Cheio de amor e ronrons"),
-                            Triple("BRINCALHAO", "Brincalhão 🧶", "Animado e saltitante"),
-                            Triple("RECLAMAO_FOFO", "Exigente 😹", "Cobrando o sachê já")
+                            Triple("CARINHOSO", "Carinhoso", Icons.Default.Favorite),
+                            Triple("BRINCALHAO", "Brincalhão", Icons.Default.AutoAwesome),
+                            Triple("RECLAMAO_FOFO", "Exigente", Icons.Default.Pets)
                         )
 
-                        tones.forEach { (key, label, _) ->
+                        tones.forEach { (key, label, icon) ->
                             FilterChip(
                                 selected = config.friendlyTone == key,
                                 onClick = {
                                     viewModel.updateReminderConfig(config.copy(friendlyTone = key))
                                 },
-                                label = { Text(label, fontSize = 11.sp) },
+                                label = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(icon, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(label, fontSize = 11.sp)
+                                    }
+                                },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = CatPeachPrimary,
@@ -451,19 +479,21 @@ fun RemindersSettingsScreen(
         }
 
         item {
-            Text(
-                text = "Horários dos Lembretes Diários ⏰",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = CatBrownText,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
+                Text(
+                    text = "Horários dos Lembretes Diários",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = CatBrownText
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(Icons.Default.Alarm, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(20.dp))
+            }
         }
 
         item {
             ReminderSlotCard(
                 title = "Manhã: Água Limpa & Comidinha",
-                iconEmoji = "💧🐟",
                 enabled = config.morningEnabled,
                 hour = config.morningHour,
                 minute = config.morningMinute,
@@ -479,7 +509,6 @@ fun RemindersSettingsScreen(
         item {
             ReminderSlotCard(
                 title = "Tarde: Brincadeira & Pelos",
-                iconEmoji = "🧶✨",
                 enabled = config.afternoonEnabled,
                 hour = config.afternoonHour,
                 minute = config.afternoonMinute,
@@ -495,7 +524,6 @@ fun RemindersSettingsScreen(
         item {
             ReminderSlotCard(
                 title = "Noite: Caixinha de Areia & Mimos",
-                iconEmoji = "🧼🌙",
                 enabled = config.eveningEnabled,
                 hour = config.eveningHour,
                 minute = config.eveningMinute,
@@ -530,12 +558,16 @@ fun RemindersSettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Perfil do Seu Gatinho 🐾",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Perfil do Seu Gatinho",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            CartoonPawPrint(size = 18.dp)
+                        }
                         OutlinedButton(
                             onClick = {
                                 if (isEditingProfile) {
@@ -545,6 +577,8 @@ fun RemindersSettingsScreen(
                             },
                             shape = RoundedCornerShape(12.dp)
                         ) {
+                            Icon(if (isEditingProfile) Icons.Default.Check else Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(if (isEditingProfile) "Salvar" else "Editar")
                         }
                     }
@@ -616,7 +650,7 @@ fun RemindersSettingsScreen(
                         
                         // Skin Selector
                         Text(
-                            text = "Escolha a Pelagem (Cores e Manchas):",
+                            text = "Escolha a Pelagem:",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = CatBrownText,
@@ -703,7 +737,6 @@ fun RemindersSettingsScreen(
 @Composable
 private fun ReminderSlotCard(
     title: String,
-    iconEmoji: String,
     enabled: Boolean,
     hour: Int,
     minute: Int,
@@ -727,7 +760,12 @@ private fun ReminderSlotCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                Text(text = iconEmoji, fontSize = 24.sp)
+                Icon(
+                    imageVector = Icons.Default.AccessTime,
+                    contentDescription = null,
+                    tint = if (enabled) CatPeachPrimary else Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
@@ -766,7 +804,7 @@ private fun ReminderSlotCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "$timeFormatted (Toque para mudar)",
+                                text = "$timeFormatted (Mudar)",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (enabled) CatPeachPrimary else Color.Gray

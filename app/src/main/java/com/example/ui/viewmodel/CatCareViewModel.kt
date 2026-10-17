@@ -329,11 +329,11 @@ class CatCareViewModel(application: Application) : AndroidViewModel(application)
             val (year, month) = _selectedYearMonth.value
             val catName = profile.value.name
             val sampleCategories = listOf(
-                Pair(MissionCategory.WATER, "Água fresquinha do pote de cerâmica! Adorei 💧"),
-                Pair(MissionCategory.FOOD, "Sachê delicioso de salmão servido no capricho! 🐟"),
-                Pair(MissionCategory.GROOMING, "Pelos escovados e brilhando como seda! ✨"),
-                Pair(MissionCategory.PLAY, "Brincadeira intensa com a varinha de penas! 🧶"),
-                Pair(MissionCategory.LOVE, "Muito chamego, massagem na barriguinha e ronrom! 💖")
+                Pair(MissionCategory.WATER, "Água fresquinha do pote de cerâmica! Adorei"),
+                Pair(MissionCategory.FOOD, "Sachê delicioso de salmão servido no capricho!"),
+                Pair(MissionCategory.GROOMING, "Pelos escovados e brilhando como seda!"),
+                Pair(MissionCategory.PLAY, "Brincadeira intensa com a varinha de penas!"),
+                Pair(MissionCategory.LOVE, "Muito chamego, massagem na barriguinha e ronrom!")
             )
 
             for ((index, item) in sampleCategories.withIndex()) {

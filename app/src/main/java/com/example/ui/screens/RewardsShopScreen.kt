@@ -19,12 +19,32 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Brush
+import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Checkroom
+import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.ScubaDiving
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.TheaterComedy
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -43,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -73,7 +94,7 @@ fun RewardsShopScreen(
     val profile by viewModel.profile.collectAsStateWithLifecycle()
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    val categories = listOf("Acessórios 👑", "Pelagens 🐱", "Temas 🌸")
+    val categories = listOf("Acessórios", "Pelagens", "Temas")
 
     val currentItems = when (selectedTab) {
         0 -> RewardCatalog.accessories
@@ -107,14 +128,18 @@ fun RewardsShopScreen(
                         .padding(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.ShoppingBag, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Lojinha de Recompensas",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 17.sp,
+                            color = CatBrownText
+                        )
+                    }
                     Text(
-                        text = "Lojinha de Recompensas do Bichano 🐟",
-                        fontWeight = FontWeight.Black,
-                        fontSize = 17.sp,
-                        color = CatBrownText
-                    )
-                    Text(
-                        text = "Complete missões diárias com fotos para ganhar peixinhos!",
+                        text = "Complete missões diárias para ganhar peixinhos!",
                         fontSize = 12.sp,
                         color = CatPeachPrimary,
                         modifier = Modifier.padding(top = 2.dp)
@@ -137,13 +162,19 @@ fun RewardsShopScreen(
                         color = Color.White.copy(alpha = 0.9f),
                         border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFCCBC))
                     ) {
-                        Text(
-                            text = "⭐ ${profile.totalScore} pts • ${ScoreCalculator.getLevelTitle(profile.level)}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = CatBrownText,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.Star, contentDescription = null, tint = CatYellow, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${profile.totalScore} pts • ${ScoreCalculator.getLevelTitle(profile.level)}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = CatBrownText
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -162,10 +193,10 @@ fun RewardsShopScreen(
                                 .padding(horizontal = 14.dp, vertical = 8.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = "🐟", fontSize = 18.sp)
+                                Icon(Icons.Default.MonetizationOn, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "${profile.fishCoins} Peixinhos",
+                                    text = "${profile.fishCoins}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
                                     color = CatBrownText
@@ -184,10 +215,10 @@ fun RewardsShopScreen(
                                 .padding(horizontal = 14.dp, vertical = 8.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = "🐾", fontSize = 18.sp)
+                                CartoonPawPrint(size = 18.dp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "${profile.pawsCount} Patinhas",
+                                    text = "${profile.pawsCount}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
                                     color = CatBrownText
@@ -294,7 +325,12 @@ private fun RewardItemCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = item.iconEmoji, fontSize = 26.sp)
+                Icon(
+                    imageVector = getRewardIcon(item.iconName),
+                    contentDescription = null,
+                    modifier = Modifier.size(28.dp),
+                    tint = if (isEquipped) CatMint else CatPeachPrimary
+                )
             }
 
             Spacer(modifier = Modifier.width(14.dp))
@@ -313,13 +349,16 @@ private fun RewardItemCard(
                 )
 
                 if (!isUnlocked && item.price > 0) {
-                    Text(
-                        text = "Preço: ${item.price} 🐟",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = CatPeachPrimary,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 2.dp)) {
+                        Text(
+                            text = "Preço: ${item.price}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = CatPeachPrimary
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(Icons.Default.MonetizationOn, contentDescription = null, tint = CatPeachPrimary, modifier = Modifier.size(14.dp))
+                    }
                 }
             }
 
@@ -331,13 +370,19 @@ private fun RewardItemCard(
                         color = CatMint.copy(alpha = 0.15f),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(
-                            text = "Em Uso ✨",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            color = CatMint,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = CatMint, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Em Uso",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = CatMint
+                            )
+                        }
                     }
                 }
                 isUnlocked -> {
@@ -356,8 +401,12 @@ private fun RewardItemCard(
                         colors = ButtonDefaults.buttonColors(containerColor = CatPink),
                         shape = RoundedCornerShape(12.dp)
                     ) {
+                        if (!canAfford) {
+                            Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
                         Text(
-                            text = if (canAfford) "Desbloquear" else "Faltam 🐟",
+                            text = if (canAfford) "Desbloquear" else "Faltam moedas",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -365,5 +414,24 @@ private fun RewardItemCard(
                 }
             }
         }
+    }
+}
+
+private fun getRewardIcon(iconName: String): ImageVector {
+    return when (iconName) {
+        "pets" -> Icons.Default.Pets
+        "celebration" -> Icons.Default.Celebration
+        "emoji_events" -> Icons.Default.EmojiEvents
+        "theater_comedy" -> Icons.Default.TheaterComedy
+        "checkroom" -> Icons.Default.Checkroom
+        "auto_awesome" -> Icons.Default.AutoAwesome
+        "local_florist" -> Icons.Default.LocalFlorist
+        "wb_sunny" -> Icons.Default.WbSunny
+        "brush" -> Icons.Default.Brush
+        "palette" -> Icons.Default.Palette
+        "eco" -> Icons.Default.Eco
+        "nights_stay" -> Icons.Default.NightsStay
+        "circle" -> Icons.Default.Circle
+        else -> Icons.Default.ShoppingBag
     }
 }

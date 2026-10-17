@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 enum class MissionCategory(
     val displayName: String,
-    val iconEmoji: String,
+    val iconEmoji: String, // Keeping name but will use icons in UI
     val defaultTitle: String,
     val defaultDescription: String,
     val suggestionPrompt: String,
@@ -14,7 +14,7 @@ enum class MissionCategory(
 ) {
     WATER(
         displayName = "Água Fresca",
-        iconEmoji = "💧",
+        iconEmoji = "water_drop",
         defaultTitle = "Trocar Água Fresquinha",
         defaultDescription = "Lavar o potinho e encher com água limpa e fresca.",
         suggestionPrompt = "Tire foto do gatinho bebendo água ou do potinho brilhando!",
@@ -23,7 +23,7 @@ enum class MissionCategory(
     ),
     FOOD(
         displayName = "Alimentação & Sachê",
-        iconEmoji = "🐟",
+        iconEmoji = "restaurant",
         defaultTitle = "Refeição do Bichano",
         defaultDescription = "Servir a ração balanceada ou um sachê delicioso.",
         suggestionPrompt = "Tire foto do pratinho ou do gatinho saboreando o rango!",
@@ -32,7 +32,7 @@ enum class MissionCategory(
     ),
     HYGIENE(
         displayName = "Caixa de Areia",
-        iconEmoji = "🧼",
+        iconEmoji = "cleaning_services",
         defaultTitle = "Limpar a Caixinha de Areia",
         defaultDescription = "Retirar torrões e manter o banheiro do felino impecável.",
         suggestionPrompt = "Tire foto da caixinha 100% limpinha e arejada!",
@@ -41,7 +41,7 @@ enum class MissionCategory(
     ),
     PLAY(
         displayName = "Brincadeira Ativa",
-        iconEmoji = "🧶",
+        iconEmoji = "sports_esports",
         defaultTitle = "Sessão de Brincadeira (15 min)",
         defaultDescription = "Gastar energia com varinha, bolinha de papel ou laser.",
         suggestionPrompt = "Fotografe o gatinho em ação caçando o brinquedo!",
@@ -50,7 +50,7 @@ enum class MissionCategory(
     ),
     GROOMING(
         displayName = "Escovação & Higiene",
-        iconEmoji = "✨",
+        iconEmoji = "brush",
         defaultTitle = "Escovar os Pelos Macios",
         defaultDescription = "Remover pelos mortos e evitar bolas de pelo no estômago.",
         suggestionPrompt = "Tire foto da escovinha com os pelos ou do pelo sedoso!",
@@ -59,7 +59,7 @@ enum class MissionCategory(
     ),
     LOVE(
         displayName = "Momento Carinho & Ronrom",
-        iconEmoji = "💖",
+        iconEmoji = "favorite",
         defaultTitle = "Checagem de Ronrom & Mimos",
         defaultDescription = "Fazer cafuné no queixo, orelhas e checar se está tudo bem.",
         suggestionPrompt = "Selfie fofa com seu gatinho relaxado e ronronando!",
@@ -68,7 +68,7 @@ enum class MissionCategory(
     ),
     HEALTH(
         displayName = "Saúde & Checkup",
-        iconEmoji = "🩺",
+        iconEmoji = "medical_services",
         defaultTitle = "Checagem Geral & Dentes",
         defaultDescription = "Checar olhos, orelhinhas limpas e hidratação.",
         suggestionPrompt = "Tire foto do gatinho com pose de modelo saudável!",
@@ -88,8 +88,8 @@ data class CatMission(
     val isCompleted: Boolean = false,
     val photoPath: String? = null,
     val completedAt: Long? = null,
-    val catComment: String = "Miau! Aprovado pelo bichano! 🐾",
-    val catMood: String = "😸",
+    val catComment: String = "Miau! Aprovado pelo bichano!",
+    val catMood: String = "Happy",
     val isCustom: Boolean = false,
     val pointsEarned: Int = 0,
     val fishEarned: Int = 0
