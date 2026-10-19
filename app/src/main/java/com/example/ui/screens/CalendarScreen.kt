@@ -17,9 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -48,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
+import com.example.ui.components.MissionCategoryIcon
 import com.example.ui.theme.CatBrownMuted
 import com.example.ui.theme.CatBrownText
 import com.example.ui.theme.CatMint
@@ -118,11 +117,15 @@ fun CalendarScreen(
                                 fontWeight = FontWeight.Bold,
                                 color = CatBrownText
                             )
-                            Text(
-                                text = "Calendário do ${profile.name} 🐾",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = CatPeachPrimary
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Calendário do ${profile.name}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = CatPeachPrimary
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                CartoonPawPrint(size = 12.dp)
+                            }
                         }
 
                         IconButton(
@@ -156,7 +159,7 @@ fun CalendarScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Calendar Grid (rendered inside non-nested Box/Column)
+                    // Calendar Grid
                     CalendarMonthGrid(
                         days = days,
                         selectedDate = selectedDate,
@@ -194,19 +197,23 @@ fun CalendarScreen(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = "🎵 Retrospectiva Musical de $monthName",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.MusicNote, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Retrospectiva Musical de $monthName",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                color = CatBrownText
+                            )
+                        }
                         Text(
                             text = "Toque para ver o carrossel de fotos com musiquinha!",
                             fontSize = 12.sp,
                             color = CatPeachPrimary
                         )
                     }
-                    Text(text = "🐾 >", fontWeight = FontWeight.Bold, color = CatPeachPrimary)
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = CatPeachPrimary, modifier = Modifier.size(20.dp))
                 }
             }
         }
@@ -244,7 +251,11 @@ fun CalendarScreen(
                     modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = mission.getCategoryEnum().iconEmoji, fontSize = 22.sp)
+                    MissionCategoryIcon(
+                        category = mission.getCategoryEnum(),
+                        modifier = Modifier.size(24.dp),
+                        tint = CatPeachPrimary
+                    )
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
@@ -253,11 +264,17 @@ fun CalendarScreen(
                             fontSize = 14.sp,
                             color = CatBrownText
                         )
-                        Text(
-                            text = if (mission.isCompleted) "Comprovado com foto 🐾" else "Pendente",
-                            fontSize = 11.sp,
-                            color = if (mission.isCompleted) CatMint else CatPeachPrimary
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = if (mission.isCompleted) "Comprovado com foto" else "Pendente",
+                                fontSize = 11.sp,
+                                color = if (mission.isCompleted) CatMint else CatPeachPrimary
+                            )
+                            if (mission.isCompleted) {
+                                Spacer(modifier = Modifier.width(4.dp))
+                                CartoonPawPrint(size = 10.dp, color = CatMint)
+                            }
+                        }
                     }
                     if (mission.isCompleted) {
                         Icon(
@@ -335,10 +352,9 @@ private fun CalendarMonthGrid(
                                         }
                                     )
                                     if (hasCompleted) {
-                                        Text(
-                                            text = "🐾",
-                                            fontSize = 9.sp,
-                                            lineHeight = 9.sp
+                                        CartoonPawPrint(
+                                            size = 10.dp,
+                                            color = if (isSelected) Color.White else CatPeachPrimary
                                         )
                                     }
                                 }

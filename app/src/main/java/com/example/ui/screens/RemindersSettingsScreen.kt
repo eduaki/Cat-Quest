@@ -23,25 +23,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -65,6 +74,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.models.ReminderConfig
+import com.example.data.models.RewardCatalog
 import com.example.notifications.CatNotificationHelper
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
@@ -82,6 +92,7 @@ import com.example.ui.theme.CatYellow
 import com.example.ui.viewmodel.CatCareViewModel
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RemindersSettingsScreen(
     viewModel: CatCareViewModel,
@@ -111,14 +122,18 @@ fun RemindersSettingsScreen(
     ) { isGranted ->
         hasNotificationPermission = isGranted
         if (isGranted) {
-            Toast.makeText(context, "Lembretes fofos ativados com sucesso! 🐾", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Lembretes ativados com sucesso!", Toast.LENGTH_SHORT).show()
         }
     }
 
     var petName by remember(profile.name) { mutableStateOf(profile.name) }
+    var petGender by remember(profile.gender) { mutableStateOf(profile.gender) }
     var petBreed by remember(profile.breed) { mutableStateOf(profile.breed) }
     var petSnack by remember(profile.favoriteSnack) { mutableStateOf(profile.favoriteSnack) }
+    var petSkin by remember(profile.equippedSkin) { mutableStateOf(profile.equippedSkin) }
+    
     var isEditingProfile by remember { mutableStateOf(false) }
+    var genderExpanded by remember { mutableStateOf(false) }
 
     val activeSchedules = remember(config) {
         CatNotificationHelper.getFormattedActiveSchedules(config)
@@ -150,12 +165,16 @@ fun RemindersSettingsScreen(
                     )
                     Spacer(modifier = Modifier.width(14.dp))
                     Column {
-                        Text(
-                            text = "Lembretes & Mensagens 🔔",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Lembretes & Mensagens",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Icon(Icons.Default.Notifications, contentDescription = null, tint = CatPeachPrimary)
+                        }
                         Text(
                             text = "Notificações carinhosas e avisos de missões do seu gato!",
                             style = MaterialTheme.typography.bodySmall,
@@ -166,7 +185,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Permission Request Banner (Android 13+)
         if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             item {
                 Card(
@@ -177,7 +195,7 @@ fun RemindersSettingsScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = "🐾", fontSize = 24.sp)
+                            CartoonPawPrint(size = 24.dp)
                             Spacer(modifier = Modifier.width(10.dp))
                             Text(
                                 text = "Permissão de Notificação Necessária",
@@ -196,14 +214,15 @@ fun RemindersSettingsScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = CatPeachPrimary),
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Autorizar Lembretes Fofos 🐾", fontWeight = FontWeight.Bold)
+                            Icon(Icons.Default.NotificationsActive, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Autorizar Lembretes", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
         }
 
-        // Active Scheduled Alarms Status Card
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -237,13 +256,24 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(8.dp),
                             color = if (activeSchedules.isNotEmpty()) CatMint.copy(alpha = 0.2f) else Color(0xFFFFECE0)
                         ) {
-                            Text(
-                                text = if (activeSchedules.isNotEmpty()) "⏰ ${activeSchedules.size} Ativos" else "Inativo",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = if (activeSchedules.isNotEmpty()) Icons.Default.AccessTime else Icons.Default.Notifications,
+                                    contentDescription = null,
+                                    tint = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = if (activeSchedules.isNotEmpty()) "${activeSchedules.size} Ativos" else "Inativo",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary
+                                )
+                            }
                         }
                     }
 
@@ -287,7 +317,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Local Notification Manager: Personalized Affection & Encouragement Section
         item {
             CatAffectionNotificationManagerSection(
                 messages = affectionMessages,
@@ -307,7 +336,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Friendly Tone Selector
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -316,12 +344,16 @@ fun RemindersSettingsScreen(
                 elevation = CardDefaults.cardElevation(2.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Tom das Mensagens do Bichano 😸",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = CatBrownText
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Tom das Mensagens do Bichano",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = CatBrownText
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Default.Pets, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(18.dp))
+                    }
                     Text(
                         text = "Personalize o jeitinho que o gato fala com você:",
                         fontSize = 12.sp,
@@ -334,18 +366,24 @@ fun RemindersSettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         val tones = listOf(
-                            Triple("CARINHOSO", "Carinhoso 💖", "Cheio de amor e ronrons"),
-                            Triple("BRINCALHAO", "Brincalhão 🧶", "Animado e saltitante"),
-                            Triple("RECLAMAO_FOFO", "Exigente 😹", "Cobrando o sachê já")
+                            Triple("CARINHOSO", "Carinhoso", Icons.Default.Favorite),
+                            Triple("BRINCALHAO", "Brincalhão", Icons.Default.AutoAwesome),
+                            Triple("RECLAMAO_FOFO", "Exigente", Icons.Default.Pets)
                         )
 
-                        tones.forEach { (key, label, _) ->
+                        tones.forEach { (key, label, icon) ->
                             FilterChip(
                                 selected = config.friendlyTone == key,
                                 onClick = {
                                     viewModel.updateReminderConfig(config.copy(friendlyTone = key))
                                 },
-                                label = { Text(label, fontSize = 11.sp) },
+                                label = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(icon, contentDescription = null, modifier = Modifier.size(14.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(label, fontSize = 11.sp)
+                                    }
+                                },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = CatPeachPrimary,
@@ -355,7 +393,6 @@ fun RemindersSettingsScreen(
                         }
                     }
 
-                    // Sample preview of message
                     val sampleMessage = remember(config.friendlyTone, profile.name) {
                         CatNotificationHelper.getRandomFriendlyMessage(
                             profile.name,
@@ -390,7 +427,6 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Sound & Vibration Preferences
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -442,22 +478,22 @@ fun RemindersSettingsScreen(
             }
         }
 
-        // Daily Reminder Slots
         item {
-            Text(
-                text = "Horários dos Lembretes Diários ⏰",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = CatBrownText,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
+                Text(
+                    text = "Horários dos Lembretes Diários",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = CatBrownText
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(Icons.Default.Alarm, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(20.dp))
+            }
         }
 
-        // Morning Slot
         item {
             ReminderSlotCard(
                 title = "Manhã: Água Limpa & Comidinha",
-                iconEmoji = "💧🐟",
                 enabled = config.morningEnabled,
                 hour = config.morningHour,
                 minute = config.morningMinute,
@@ -470,11 +506,9 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Afternoon Slot
         item {
             ReminderSlotCard(
                 title = "Tarde: Brincadeira & Pelos",
-                iconEmoji = "🧶✨",
                 enabled = config.afternoonEnabled,
                 hour = config.afternoonHour,
                 minute = config.afternoonMinute,
@@ -487,11 +521,9 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Evening Slot
         item {
             ReminderSlotCard(
                 title = "Noite: Caixinha de Areia & Mimos",
-                iconEmoji = "🧼🌙",
                 enabled = config.eveningEnabled,
                 hour = config.eveningHour,
                 minute = config.eveningMinute,
@@ -504,7 +536,6 @@ fun RemindersSettingsScreen(
             )
         }
 
-        // Weekly Missions Progress Bar Chart (D3 / Recharts inside Compose)
         item {
             WeekMissionsBarChart(
                 weekData = weekData,
@@ -527,28 +558,35 @@ fun RemindersSettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Perfil do Seu Gatinho 🐾",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Perfil do Seu Gatinho",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            CartoonPawPrint(size = 18.dp)
+                        }
                         OutlinedButton(
                             onClick = {
                                 if (isEditingProfile) {
-                                    viewModel.updateProfile(petName, petBreed, petSnack)
+                                    viewModel.updateProfile(petName, petGender, petBreed, petSnack, petSkin)
                                 }
                                 isEditingProfile = !isEditingProfile
                             },
                             shape = RoundedCornerShape(12.dp)
                         ) {
+                            Icon(if (isEditingProfile) Icons.Default.Check else Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(if (isEditingProfile) "Salvar" else "Editar")
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     if (isEditingProfile) {
+                        // Edit Mode
                         OutlinedTextField(
                             value = petName,
                             onValueChange = { petName = it },
@@ -557,16 +595,48 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
+                        
+                        // Gender Selector
+                        ExposedDropdownMenuBox(
+                            expanded = genderExpanded,
+                            onExpandedChange = { genderExpanded = !genderExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = petGender,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Gênero") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            ExposedDropdownMenu(
+                                expanded = genderExpanded,
+                                onDismissRequest = { genderExpanded = false }
+                            ) {
+                                listOf("Macho", "Fêmea", "Outro").forEach { gender ->
+                                    DropdownMenuItem(
+                                        text = { Text(gender) },
+                                        onClick = {
+                                            petGender = gender
+                                            genderExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
                             value = petBreed,
                             onValueChange = { petBreed = it },
-                            label = { Text("Raça / Tipo de Pelagem") },
+                            label = { Text("Raça / Tipo") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
                             value = petSnack,
                             onValueChange = { petSnack = it },
@@ -575,23 +645,88 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        // Skin Selector
+                        Text(
+                            text = "Escolha a Pelagem:",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = CatBrownText,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            items(RewardCatalog.skins) { skinItem ->
+                                val isSelected = petSkin == skinItem.id
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .clickable { petSkin = skinItem.id }
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(if (isSelected) CatPeachLight else Color(0xFFF5F5F5))
+                                            .border(
+                                                width = if (isSelected) 2.dp else 1.dp,
+                                                color = if (isSelected) CatPeachPrimary else Color.Transparent,
+                                                shape = RoundedCornerShape(12.dp)
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CartoonCatFace(size = 48.dp, skinType = skinItem.id)
+                                    }
+                                    Text(
+                                        text = skinItem.name.split(" ")[0], // Show first word
+                                        fontSize = 10.sp,
+                                        color = if (isSelected) CatPeachPrimary else CatBrownMuted,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+
                     } else {
-                        Text(
-                            text = "Nome: ${profile.name}",
-                            fontWeight = FontWeight.SemiBold,
-                            color = CatPeachPrimary,
-                            fontSize = 14.sp
-                        )
-                        Text(
-                            text = "Pelagem: ${profile.breed}",
-                            color = CatBrownMuted,
-                            fontSize = 13.sp
-                        )
-                        Text(
-                            text = "Petisco Preferido: ${profile.favoriteSnack}",
-                            color = CatBrownMuted,
-                            fontSize = 13.sp
-                        )
+                        // View Mode
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            CartoonCatFace(
+                                size = 80.dp,
+                                skinType = profile.equippedSkin,
+                                accessoryType = profile.equippedAccessory
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Column {
+                                Text(
+                                    text = "Nome: ${profile.name}",
+                                    fontWeight = FontWeight.Bold,
+                                    color = CatPeachPrimary,
+                                    fontSize = 16.sp
+                                )
+                                Text(
+                                    text = "Gênero: ${profile.gender}",
+                                    color = CatBrownText,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Raça: ${profile.breed}",
+                                    color = CatBrownMuted,
+                                    fontSize = 14.sp
+                                )
+                                Text(
+                                    text = "Petisco: ${profile.favoriteSnack}",
+                                    color = CatBrownMuted,
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -602,7 +737,6 @@ fun RemindersSettingsScreen(
 @Composable
 private fun ReminderSlotCard(
     title: String,
-    iconEmoji: String,
     enabled: Boolean,
     hour: Int,
     minute: Int,
@@ -626,7 +760,12 @@ private fun ReminderSlotCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                Text(text = iconEmoji, fontSize = 24.sp)
+                Icon(
+                    imageVector = Icons.Default.AccessTime,
+                    contentDescription = null,
+                    tint = if (enabled) CatPeachPrimary else Color.Gray,
+                    modifier = Modifier.size(24.dp)
+                )
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
@@ -665,7 +804,7 @@ private fun ReminderSlotCard(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "$timeFormatted (Toque para mudar)",
+                                text = "$timeFormatted (Mudar)",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = if (enabled) CatPeachPrimary else Color.Gray

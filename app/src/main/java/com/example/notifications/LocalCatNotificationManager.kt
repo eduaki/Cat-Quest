@@ -18,7 +18,7 @@ import kotlin.random.Random
 object LocalCatNotificationManager {
 
     const val CHANNEL_ID = "cat_affection_encouragement_channel"
-    const val CHANNEL_NAME = "Carinho & Incentivo Felino 🐾💖"
+    const val CHANNEL_NAME = "Carinho & Incentivo Felino"
     const val CHANNEL_DESC = "Mensagens personalizadas de carinho, apoio emocional e incentivo do seu gatinho ao longo do dia!"
 
     const val REQ_AFFECTION_ALARM = 201
@@ -94,19 +94,19 @@ object LocalCatNotificationManager {
             .setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(formattedText)
-                    .setSummaryText("Recado de Amor do $name 🐾")
+                    .setSummaryText("Recado de Amor do $name")
             )
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(openAppPendingIntent)
             .addAction(
                 R.drawable.ic_launcher_foreground,
-                "Mandar Cafuné 💖",
+                "Mandar Cafuné",
                 cuddlePendingIntent
             )
             .addAction(
                 R.drawable.ic_launcher_foreground,
-                "Ver Missões 🐾",
+                "Ver Missões",
                 openAppPendingIntent
             )
 

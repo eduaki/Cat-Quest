@@ -42,16 +42,25 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Collections
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -97,6 +106,7 @@ import com.example.data.models.CatMission
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
 import com.example.ui.components.FloatingMusicNotes
+import com.example.ui.components.MissionCategoryIcon
 import com.example.ui.theme.CatBrownMuted
 import com.example.ui.theme.CatBrownText
 import com.example.ui.theme.CatMint
@@ -283,8 +293,10 @@ fun MonthRecapCarouselScreen(
                 ) {
                     CartoonPawPrint(size = 26.dp, color = CatPeachPrimary)
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.MusicNote, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "🎵 Trilha Sonora da Retrospectiva",
+                            text = "Trilha Sonora da Retrospectiva",
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
                             color = CatBrownText
@@ -404,13 +416,19 @@ fun MonthRecapCarouselScreen(
                         shape = RoundedCornerShape(12.dp),
                         shadowElevation = 1.dp
                     ) {
-                        Text(
-                            text = "📸 Foto ${pagerState.currentPage + 1} de ${photos.size}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            color = CatBrownText,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.CameraAlt, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(14.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "Foto ${pagerState.currentPage + 1} de ${photos.size}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = CatBrownText
+                            )
+                        }
                     }
 
                     IconButton(
@@ -497,8 +515,15 @@ fun MonthRecapCarouselScreen(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Icon(
+                            imageVector = if (isAutoPlayEnabled) Icons.Default.Timer else Icons.Default.Pause,
+                            contentDescription = null,
+                            tint = if (isAutoPlayEnabled) CatPeachPrimary else CatBrownMuted,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isAutoPlayEnabled) "⏱️ Carrossel Automático Ativo" else "⏸️ Carrossel em Pausa",
+                            text = if (isAutoPlayEnabled) "Carrossel Automático Ativo" else "Carrossel em Pausa",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isAutoPlayEnabled) CatPeachPrimary else CatBrownMuted
@@ -547,7 +572,9 @@ fun MonthRecapCarouselScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = CatPeachPrimary),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("🖼️ Ver no Mural", fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.Collections, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Ver no Mural", fontWeight = FontWeight.Bold)
             }
 
             OutlinedButton(
@@ -703,11 +730,20 @@ private fun SoundtrackPlayerBar(
                         )
                     }
 
-                    Text(
-                        text = if (isCustom) "Arquivo de áudio personalizado 🎧" else "Trilha sonora musical fofa 🎶",
-                        fontSize = 11.sp,
-                        color = CatBrownMuted
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = if (isCustom) Icons.Default.Headphones else Icons.Default.MusicNote,
+                            contentDescription = null,
+                            tint = CatBrownMuted,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = if (isCustom) "Arquivo de áudio personalizado" else "Trilha sonora musical fofa",
+                            fontSize = 11.sp,
+                            color = CatBrownMuted
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -736,13 +772,19 @@ private fun SoundtrackPlayerBar(
                         .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(
-                        text = "Restaurar melodias de caixinha de música 🐾",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = CatPeachPrimary,
-                        modifier = Modifier.clickable { onResetToMelodies() }
-                    )
+                    Row(
+                        modifier = Modifier.clickable { onResetToMelodies() },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CartoonPawPrint(size = 12.dp, color = CatPeachPrimary)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "Restaurar melodias de caixinha de música",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = CatPeachPrimary
+                        )
+                    }
                 }
             }
         }
@@ -824,16 +866,22 @@ private fun PolaroidPhotoCard(
                         .align(Alignment.BottomEnd)
                         .padding(8.dp)
                 ) {
-                    Text(
-                        text = "📅 ${DateUtils.formatDayMonth(mission.date)}",
-                        color = Color.White,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Color.White, modifier = Modifier.size(12.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = DateUtils.formatDayMonth(mission.date),
+                            color = Color.White,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
-                // Category emoji badge
+                // Category icon badge
                 Surface(
                     color = CatPeachPrimary,
                     shape = CircleShape,
@@ -841,10 +889,10 @@ private fun PolaroidPhotoCard(
                         .align(Alignment.TopStart)
                         .padding(8.dp)
                 ) {
-                    Text(
-                        text = mission.getCategoryEnum().iconEmoji,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(6.dp)
+                    MissionCategoryIcon(
+                        category = mission.getCategoryEnum(),
+                        modifier = Modifier.size(24.dp).padding(4.dp),
+                        tint = Color.White
                     )
                 }
             }
@@ -852,13 +900,21 @@ private fun PolaroidPhotoCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Polaroid caption
-            Text(
-                text = "${mission.getCategoryEnum().iconEmoji} ${mission.title}",
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-                color = CatBrownText,
-                textAlign = TextAlign.Center
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                MissionCategoryIcon(
+                    category = mission.getCategoryEnum(),
+                    modifier = Modifier.size(18.dp),
+                    tint = CatPeachPrimary
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = mission.title,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = CatBrownText,
+                    textAlign = TextAlign.Center
+                )
+            }
 
             Text(
                 text = "\"${mission.catComment}\"",
@@ -881,12 +937,16 @@ private fun PolaroidPhotoCard(
                     )
                 }
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Aprovado por $catName 🐾",
-                    fontSize = 11.sp,
-                    color = CatBrownMuted,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Aprovado por $catName",
+                        fontSize = 11.sp,
+                        color = CatBrownMuted,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    CartoonPawPrint(size = 10.dp)
+                }
             }
         }
     }
@@ -927,12 +987,16 @@ private fun EmptyRecapCard(
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = "O $catName está te esperando para cumprir missões com fotos e criar a retrospectiva animada com trilha sonora! 🐾📸",
-                fontSize = 13.sp,
-                color = CatBrownMuted,
-                textAlign = TextAlign.Center
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "O $catName está te esperando para cumprir missões!",
+                    fontSize = 13.sp,
+                    color = CatBrownMuted,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                CartoonPawPrint(size = 14.dp)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -942,7 +1006,9 @@ private fun EmptyRecapCard(
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth().testTag("generate_sample_recap_button")
             ) {
-                Text("✨ Gerar Demonstração do Mês", fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Gerar Demonstração do Mês", fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -952,7 +1018,9 @@ private fun EmptyRecapCard(
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Cumprir Missão Diária com Foto 📸")
+                Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Cumprir Missão Diária com Foto")
             }
         }
     }
@@ -973,35 +1041,43 @@ private fun RecapStatsCard(
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
-            Text(
-                text = "Estatísticas do Miau Amor 💖",
-                fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
-                color = CatBrownText
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Favorite, contentDescription = null, tint = CatPink, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Estatísticas do Miau Amor",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    color = CatBrownText
+                )
+            }
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                StatItem(label = "Fotos no Álbum", value = "$totalPhotos 📸", color = CatPeachPrimary)
-                StatItem(label = "Sequência", value = "$streakDays dias 🔥", color = CatPink)
-                StatItem(label = "Amor Felino", value = "100% 😻", color = CatMint)
+                StatItem(label = "Fotos no Álbum", value = "$totalPhotos", icon = Icons.Default.CameraAlt, color = CatPeachPrimary)
+                StatItem(label = "Sequência", value = "$streakDays dias", icon = Icons.Default.LocalFireDepartment, color = CatPink)
+                StatItem(label = "Amor Felino", value = "100%", icon = Icons.Default.Pets, color = CatMint)
             }
         }
     }
 }
 
 @Composable
-private fun StatItem(label: String, value: String, color: Color) {
+private fun StatItem(label: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value,
-            fontWeight = FontWeight.Black,
-            fontSize = 17.sp,
-            color = color
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = value,
+                fontWeight = FontWeight.Black,
+                fontSize = 17.sp,
+                color = color
+            )
+        }
         Text(
             text = label,
             fontSize = 11.sp,
@@ -1031,12 +1107,16 @@ private fun RecapPhotoZoomDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "📅 ${DateUtils.formatDayMonth(mission.date)}",
-                        fontWeight = FontWeight.Bold,
-                        color = CatPeachPrimary,
-                        fontSize = 14.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = CatPeachPrimary, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = DateUtils.formatDayMonth(mission.date),
+                            fontWeight = FontWeight.Bold,
+                            color = CatPeachPrimary,
+                            fontSize = 14.sp
+                        )
+                    }
                     IconButton(onClick = onDismiss) {
                         Icon(Icons.Default.Close, contentDescription = "Fechar")
                     }
@@ -1069,12 +1149,20 @@ private fun RecapPhotoZoomDialog(
 
                 Spacer(modifier = Modifier.height(14.dp))
 
-                Text(
-                    text = "${mission.getCategoryEnum().iconEmoji} ${mission.title}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = CatBrownText
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    MissionCategoryIcon(
+                        category = mission.getCategoryEnum(),
+                        modifier = Modifier.size(24.dp),
+                        tint = CatPeachPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = mission.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = CatBrownText
+                    )
+                }
 
                 Text(
                     text = "\"${mission.catComment}\"",
@@ -1086,11 +1174,17 @@ private fun RecapPhotoZoomDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = "Aprovado com 5 estrelas pelo gatinho $catName! ⭐⭐⭐⭐⭐",
-                    fontSize = 11.sp,
-                    color = CatBrownMuted
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Aprovado pelo gatinho $catName!",
+                        fontSize = 11.sp,
+                        color = CatBrownMuted
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    repeat(5) {
+                        Icon(Icons.Default.Star, contentDescription = null, tint = CatYellow, modifier = Modifier.size(12.dp))
+                    }
+                }
             }
         }
     }

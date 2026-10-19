@@ -19,13 +19,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -108,12 +115,16 @@ fun CatAffectionNotificationManagerSection(
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
-                        Text(
-                            text = "Carinho & Incentivo Diário 💌",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = CatBrownText
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Carinho & Incentivo Diário",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Icon(Icons.Default.Favorite, contentDescription = null, tint = CatPink, modifier = Modifier.size(16.dp))
+                        }
                         Text(
                             text = "Notificações de apoio e afeto do $catName ao longo do dia",
                             fontSize = 12.sp,
@@ -133,7 +144,7 @@ fun CatAffectionNotificationManagerSection(
                 Button(
                     onClick = {
                         onDispatchNow(null)
-                        Toast.makeText(context, "Notificação de carinho enviada! 😻", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Notificação de carinho enviada!", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.weight(1f).testTag("dispatch_affection_now_button"),
                     colors = ButtonDefaults.buttonColors(containerColor = CatPink),
@@ -141,7 +152,7 @@ fun CatAffectionNotificationManagerSection(
                 ) {
                     Icon(Icons.Default.Send, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("Disparar Agora 💖", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text("Disparar Agora", fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 }
 
                 OutlinedButton(
@@ -149,9 +160,9 @@ fun CatAffectionNotificationManagerSection(
                     modifier = Modifier.weight(1f).testTag("add_custom_affection_button"),
                     shape = RoundedCornerShape(14.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp), tint = CatPeachPrimary)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Criar Recado ✍️", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = CatPeachPrimary)
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp), tint = CatPeachPrimary)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Criar Recado", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = CatPeachPrimary)
                 }
             }
 
@@ -173,7 +184,7 @@ fun CatAffectionNotificationManagerSection(
             ) {
                 val intervals = listOf(
                     Pair(2, "A cada 2h"),
-                    Pair(4, "A cada 4h ⭐"),
+                    Pair(4, "A cada 4h"),
                     Pair(6, "A cada 6h"),
                     Pair(8, "2x ao dia")
                 )
@@ -189,9 +200,17 @@ fun CatAffectionNotificationManagerSection(
                                 intervalHours = hours,
                                 catName = catName
                             )
-                            Toast.makeText(context, "Frequência ajustada para $label! 🐾", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Frequência ajustada para $label!", Toast.LENGTH_SHORT).show()
                         },
-                        label = { Text(label, fontSize = 10.sp) },
+                        label = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (hours == 4) {
+                                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(12.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                }
+                                Text(label, fontSize = 10.sp)
+                            }
+                        },
                         modifier = Modifier.weight(1f),
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = CatPeachPrimary,
@@ -218,12 +237,20 @@ fun CatAffectionNotificationManagerSection(
                     color = CatBrownText
                 )
 
-                Text(
-                    text = if (isListExpanded) "Ocultar ▲" else "Ver Todas ▼",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = CatPeachPrimary
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = if (isListExpanded) "Ocultar" else "Ver Todas",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = CatPeachPrimary
+                    )
+                    Icon(
+                        imageVector = if (isListExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = null,
+                        tint = CatPeachPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
             AnimatedVisibility(visible = isListExpanded) {
@@ -258,7 +285,7 @@ fun CatAffectionNotificationManagerSection(
             onConfirm = { title, text, category ->
                 onAddCustomMessage(title, text, category)
                 showAddDialog = false
-                Toast.makeText(context, "Novo recado salvo com sucesso! 💖", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Novo recado salvo!", Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -302,18 +329,31 @@ private fun AffectionMessageRowItem(
                             else -> CatPeachLight.copy(alpha = 0.5f)
                         }
                     ) {
-                        Text(
-                            text = when (message.category) {
-                                "CARINHO" -> "💖 Carinho"
-                                "AUTOESTIMA" -> "🌟 Autoestima"
-                                "SAUDE_MENTAL" -> "🍃 Calma"
-                                else -> "🐾 Incentivo"
-                            },
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = CatBrownText,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)) {
+                            Icon(
+                                imageVector = when (message.category) {
+                                    "CARINHO" -> Icons.Default.Favorite
+                                    "AUTOESTIMA" -> Icons.Default.Star
+                                    "SAUDE_MENTAL" -> Icons.Default.AutoAwesome
+                                    else -> Icons.Default.Pets
+                                },
+                                contentDescription = null,
+                                modifier = Modifier.size(10.dp),
+                                tint = CatBrownText
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = when (message.category) {
+                                    "CARINHO" -> "Carinho"
+                                    "AUTOESTIMA" -> "Autoestima"
+                                    "SAUDE_MENTAL" -> "Calma"
+                                    else -> "Incentivo"
+                                },
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = CatBrownText
+                            )
+                        }
                     }
 
                     if (message.isCustom) {
@@ -322,13 +362,16 @@ private fun AffectionMessageRowItem(
                             shape = RoundedCornerShape(6.dp),
                             color = Color(0xFFE8DEF8)
                         ) {
-                            Text(
-                                text = "✍️ Seu Recado",
-                                fontSize = 9.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4A148C),
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)) {
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(10.dp), tint = Color(0xFF4A148C))
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Seu Recado",
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF4A148C)
+                                )
+                            }
                         }
                     }
                 }
@@ -399,8 +442,8 @@ private fun CreateCustomAffectionDialog(
     onDismiss: () -> Unit,
     onConfirm: (String, String, String) -> Unit
 ) {
-    var title by remember { mutableStateOf("💖 Um Recado do {gato}!") }
-    var text by remember { mutableStateOf("O {gato} passou aqui pra lembrar que você é incrível e muito amado! 🐾✨") }
+    var title by remember { mutableStateOf("Um Recado do {gato}!") }
+    var text by remember { mutableStateOf("O {gato} passou aqui pra lembrar que você é incrível e muito amado! ✨") }
     var category by remember { mutableStateOf("INCENTIVO") }
 
     Dialog(onDismissRequest = onDismiss) {
@@ -418,12 +461,16 @@ private fun CreateCustomAffectionDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Novo Recado Personalizado 💌",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = CatBrownText
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Novo Recado Personalizado",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = CatBrownText
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(Icons.Default.Favorite, contentDescription = null, tint = CatPink, modifier = Modifier.size(20.dp))
+                    }
                     IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
                         Icon(Icons.Default.Close, contentDescription = "Fechar")
                     }
@@ -467,17 +514,23 @@ private fun CreateCustomAffectionDialog(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     val cats = listOf(
-                        Pair("INCENTIVO", "🐾 Incentivo"),
-                        Pair("CARINHO", "💖 Carinho"),
-                        Pair("AUTOESTIMA", "🌟 Autoestima"),
-                        Pair("SAUDE_MENTAL", "🍃 Calma")
+                        Triple("INCENTIVO", "Incentivo", Icons.Default.Pets),
+                        Triple("CARINHO", "Carinho", Icons.Default.Favorite),
+                        Triple("AUTOESTIMA", "Autoestima", Icons.Default.Star),
+                        Triple("SAUDE_MENTAL", "Calma", Icons.Default.AutoAwesome)
                     )
 
-                    cats.forEach { (catKey, label) ->
+                    cats.forEach { (catKey, label, icon) ->
                         FilterChip(
                             selected = category == catKey,
                             onClick = { category = catKey },
-                            label = { Text(label, fontSize = 10.sp) },
+                            label = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(icon, contentDescription = null, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(label, fontSize = 10.sp)
+                                }
+                            },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = CatPeachPrimary,
                                 selectedLabelColor = Color.White
@@ -524,7 +577,9 @@ private fun CreateCustomAffectionDialog(
                     colors = ButtonDefaults.buttonColors(containerColor = CatPeachPrimary),
                     shape = RoundedCornerShape(14.dp)
                 ) {
-                    Text("Salvar Recado de Amor 🐾", fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Favorite, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Salvar Recado de Amor", fontWeight = FontWeight.Bold)
                 }
             }
         }

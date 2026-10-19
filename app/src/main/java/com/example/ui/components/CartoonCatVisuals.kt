@@ -8,20 +8,10 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
@@ -43,7 +32,6 @@ import com.example.ui.theme.CatBrownText
 import com.example.ui.theme.CatPeachPrimary
 import com.example.ui.theme.CatPink
 import com.example.ui.theme.CatPinkLight
-import com.example.ui.theme.CatYellow
 
 @Composable
 fun CartoonCatFace(
@@ -68,17 +56,20 @@ fun CartoonCatFace(
         "BLACK" -> Color(0xFF37474F)
         "SIAMESE" -> Color(0xFFFFF8E7)
         "CALICO" -> Color(0xFFFFFDF8)
+        "TUXEDO" -> Color(0xFF37474F)
+        "TABBY" -> Color(0xFFBDBDBD)
+        "SPOTTED_GRAY", "SPOTTED_BROWN", "SPOTTED_BLACK", "SPOTTED_ORANGE" -> Color.White
         else -> Color.White
     }
 
     val outlineColor = when (skinType) {
-        "BLACK" -> Color(0xFF212121)
+        "BLACK", "TUXEDO" -> Color(0xFF212121)
         else -> CatBrownText
     }
 
     val eyeColor = when (skinType) {
-        "BLACK" -> Color(0xFFFFD54F) // Shiny golden cat eyes for black cat
-        "SIAMESE" -> Color(0xFF29B6F6) // Sapphire blue eyes for Siamese
+        "BLACK", "TUXEDO" -> Color(0xFFFFD54F) 
+        "SIAMESE" -> Color(0xFF29B6F6) 
         else -> CatBrownText
     }
 
@@ -102,10 +93,10 @@ fun CartoonCatFace(
             close()
         }
 
-        val earOuterColor = if (skinType == "SIAMESE") Color(0xFF5D4037) else furColor
-        drawPath(leftEar, color = earOuterColor)
+        val earOuterColor = if (skinType == "SIAMESE" || skinType == "TUXEDO" || skinType == "BLACK") Color(0xFF37474F) else furColor
+        drawPath(leftEar, color = if (skinType == "SIAMESE") Color(0xFF5D4037) else earOuterColor)
         drawPath(leftEar, color = outlineColor, style = Stroke(width = w * 0.035f))
-        drawPath(rightEar, color = earOuterColor)
+        drawPath(rightEar, color = if (skinType == "SIAMESE") Color(0xFF5D4037) else earOuterColor)
         drawPath(rightEar, color = outlineColor, style = Stroke(width = w * 0.035f))
 
         // Inner pink ears
@@ -134,19 +125,48 @@ fun CartoonCatFace(
             cornerRadius = CornerRadius(w * 0.4f, h * 0.35f)
         )
 
-        // Special patterns for Siamese / Calico
-        if (skinType == "SIAMESE") {
-            // Siamese nose mask
-            drawCircle(
-                color = Color(0xFF5D4037),
-                radius = w * 0.18f,
-                center = Offset(cx, cy + h * 0.04f)
-            )
-        } else if (skinType == "CALICO") {
-            // Calico orange spot
-            drawCircle(color = Color(0xFFFF9800), radius = w * 0.14f, center = Offset(cx - w * 0.25f, cy - h * 0.18f))
-            // Calico black spot
-            drawCircle(color = Color(0xFF37474F), radius = w * 0.12f, center = Offset(cx + w * 0.22f, cy - h * 0.16f))
+        // Special patterns
+        when (skinType) {
+            "SIAMESE" -> {
+                drawCircle(color = Color(0xFF5D4037), radius = w * 0.18f, center = Offset(cx, cy + h * 0.04f))
+            }
+            "CALICO" -> {
+                drawCircle(color = Color(0xFFFF9800), radius = w * 0.14f, center = Offset(cx - w * 0.25f, cy - h * 0.18f))
+                drawCircle(color = Color(0xFF37474F), radius = w * 0.12f, center = Offset(cx + w * 0.22f, cy - h * 0.16f))
+            }
+            "TUXEDO" -> {
+                val tuxedoPath = Path().apply {
+                    moveTo(cx, cy - h * 0.1f)
+                    quadraticTo(cx - w * 0.25f, cy + h * 0.1f, cx - w * 0.2f, cy + h * 0.38f)
+                    lineTo(cx + w * 0.2f, cy + h * 0.38f)
+                    quadraticTo(cx + w * 0.25f, cy + h * 0.1f, cx, cy - h * 0.1f)
+                    close()
+                }
+                drawPath(tuxedoPath, color = Color.White)
+            }
+            "TABBY" -> {
+                val stripeColor = Color(0xFF757575)
+                drawLine(stripeColor, Offset(cx - w * 0.1f, cy - h * 0.35f), Offset(cx - w * 0.1f, cy - h * 0.2f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
+                drawLine(stripeColor, Offset(cx, cy - h * 0.38f), Offset(cx, cy - h * 0.23f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
+                drawLine(stripeColor, Offset(cx + w * 0.1f, cy - h * 0.35f), Offset(cx + w * 0.1f, cy - h * 0.2f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
+            }
+            "SPOTTED_GRAY" -> {
+                drawCircle(Color(0xFF9E9E9E), w * 0.12f, Offset(cx - w * 0.2f, cy - h * 0.2f))
+                drawCircle(Color(0xFF757575), w * 0.08f, Offset(cx + w * 0.25f, cy + h * 0.1f))
+            }
+            "SPOTTED_BROWN" -> {
+                drawCircle(Color(0xFF8D6E63), w * 0.13f, Offset(cx + w * 0.22f, cy - h * 0.18f))
+                drawCircle(Color(0xFF5D4037), w * 0.09f, Offset(cx - w * 0.28f, cy + h * 0.05f))
+            }
+            "SPOTTED_BLACK" -> {
+                drawCircle(Color(0xFF212121), w * 0.15f, Offset(cx - w * 0.22f, cy - h * 0.15f))
+                drawCircle(Color(0xFF212121), w * 0.10f, Offset(cx + w * 0.28f, cy + h * 0.08f))
+                drawCircle(Color(0xFF212121), w * 0.07f, Offset(cx + w * 0.05f, cy - h * 0.28f))
+            }
+            "SPOTTED_ORANGE" -> {
+                drawCircle(Color(0xFFFF9800), w * 0.14f, Offset(cx + w * 0.24f, cy - h * 0.20f))
+                drawCircle(Color(0xFFFFB74D), w * 0.11f, Offset(cx - w * 0.26f, cy + h * 0.12f))
+            }
         }
 
         drawRoundRect(
@@ -158,46 +178,19 @@ fun CartoonCatFace(
         )
 
         // Cute rosy cheeks
-        drawCircle(
-            color = CatPinkLight.copy(alpha = 0.8f),
-            radius = w * 0.08f,
-            center = Offset(cx - w * 0.26f, cy + h * 0.08f)
-        )
-        drawCircle(
-            color = CatPinkLight.copy(alpha = 0.8f),
-            radius = w * 0.08f,
-            center = Offset(cx + w * 0.26f, cy + h * 0.08f)
-        )
+        drawCircle(color = CatPinkLight.copy(alpha = 0.8f), radius = w * 0.08f, center = Offset(cx - w * 0.26f, cy + h * 0.08f))
+        drawCircle(color = CatPinkLight.copy(alpha = 0.8f), radius = w * 0.08f, center = Offset(cx + w * 0.26f, cy + h * 0.08f))
 
         // Eyes
         val eyeRadius = w * 0.05f
         if (accessoryType == "SUNGLASSES") {
-            // Sunglasses
             val glassesY = cy - h * 0.04f
-            drawRoundRect(
-                color = Color(0xFF212121),
-                topLeft = Offset(cx - w * 0.26f, glassesY - h * 0.04f),
-                size = Size(w * 0.22f, h * 0.10f),
-                cornerRadius = CornerRadius(w * 0.03f, w * 0.03f)
-            )
-            drawRoundRect(
-                color = Color(0xFF212121),
-                topLeft = Offset(cx + w * 0.04f, glassesY - h * 0.04f),
-                size = Size(w * 0.22f, h * 0.10f),
-                cornerRadius = CornerRadius(w * 0.03f, w * 0.03f)
-            )
-            // Bridge
-            drawLine(
-                color = Color(0xFF212121),
-                start = Offset(cx - w * 0.05f, glassesY),
-                end = Offset(cx + w * 0.05f, glassesY),
-                strokeWidth = w * 0.03f
-            )
+            drawRoundRect(color = Color(0xFF212121), topLeft = Offset(cx - w * 0.26f, glassesY - h * 0.04f), size = Size(w * 0.22f, h * 0.10f), cornerRadius = CornerRadius(w * 0.03f, w * 0.03f))
+            drawRoundRect(color = Color(0xFF212121), topLeft = Offset(cx + w * 0.04f, glassesY - h * 0.04f), size = Size(w * 0.22f, h * 0.10f), cornerRadius = CornerRadius(w * 0.03f, w * 0.03f))
+            drawLine(color = Color(0xFF212121), start = Offset(cx - w * 0.05f, glassesY), end = Offset(cx + w * 0.05f, glassesY), strokeWidth = w * 0.03f)
         } else {
             drawCircle(color = eyeColor, radius = eyeRadius, center = Offset(cx - w * 0.15f, cy - h * 0.04f))
             drawCircle(color = eyeColor, radius = eyeRadius, center = Offset(cx + w * 0.15f, cy - h * 0.04f))
-
-            // Eye shines
             drawCircle(color = Color.White, radius = eyeRadius * 0.4f, center = Offset(cx - w * 0.16f, cy - h * 0.06f))
             drawCircle(color = Color.White, radius = eyeRadius * 0.4f, center = Offset(cx + w * 0.14f, cy - h * 0.06f))
         }
@@ -211,25 +204,25 @@ fun CartoonCatFace(
         }
         drawPath(nosePath, color = CatPink)
 
-        // Mouth (w shape)
+        // Mouth
         val mouthY = cy + h * 0.06f
-        val mouthColor = if (skinType == "BLACK") Color(0xFFEEEEEE) else outlineColor
+        val actualMouthColor = if (skinType == "BLACK" || skinType == "TUXEDO") Color(0xFFEEEEEE) else outlineColor
         val mouthW = Path().apply {
             moveTo(cx, mouthY)
             quadraticTo(cx - w * 0.05f, mouthY + h * 0.06f, cx - w * 0.10f, mouthY + h * 0.02f)
             moveTo(cx, mouthY)
             quadraticTo(cx + w * 0.05f, mouthY + h * 0.06f, cx + w * 0.10f, mouthY + h * 0.02f)
         }
-        drawPath(mouthW, color = mouthColor, style = Stroke(width = w * 0.025f, cap = StrokeCap.Round))
+        drawPath(mouthW, color = actualMouthColor, style = Stroke(width = w * 0.025f, cap = StrokeCap.Round))
 
         // Whiskers
-        val whiskerColor = if (skinType == "BLACK") Color(0xFFB0BEC5) else outlineColor.copy(alpha = 0.7f)
+        val whiskerColor = if (skinType == "BLACK" || skinType == "TUXEDO") Color(0xFFB0BEC5) else outlineColor.copy(alpha = 0.7f)
         drawLine(color = whiskerColor, start = Offset(cx - w * 0.24f, cy), end = Offset(cx - w * 0.42f, cy - h * 0.04f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
         drawLine(color = whiskerColor, start = Offset(cx - w * 0.24f, cy + h * 0.05f), end = Offset(cx - w * 0.44f, cy + h * 0.06f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
         drawLine(color = whiskerColor, start = Offset(cx + w * 0.24f, cy), end = Offset(cx + w * 0.42f, cy - h * 0.04f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
         drawLine(color = whiskerColor, start = Offset(cx + w * 0.24f, cy + h * 0.05f), end = Offset(cx + w * 0.44f, cy + h * 0.06f), strokeWidth = w * 0.02f, cap = StrokeCap.Round)
 
-        // Accessories on top of head
+        // Accessories
         when (accessoryType) {
             "CROWN" -> {
                 val crownPath = Path().apply {
@@ -244,11 +237,9 @@ fun CartoonCatFace(
                 }
                 drawPath(crownPath, color = Color(0xFFFFD54F))
                 drawPath(crownPath, color = outlineColor, style = Stroke(width = w * 0.025f))
-                // Crown rubies
                 drawCircle(color = Color(0xFFE91E63), radius = w * 0.025f, center = Offset(cx, cy - h * 0.44f))
             }
             "BOW" -> {
-                // Kawaii pink bow near right ear
                 val bowCx = cx + w * 0.24f
                 val bowCy = cy - h * 0.32f
                 val bowPath = Path().apply {
@@ -265,39 +256,13 @@ fun CartoonCatFace(
                 drawCircle(color = Color(0xFFFF4081), radius = w * 0.04f, center = Offset(bowCx, bowCy))
             }
             "TOPHAT" -> {
-                val hatBase = Path().apply {
-                    moveTo(cx - w * 0.25f, cy - h * 0.36f)
-                    lineTo(cx + w * 0.25f, cy - h * 0.36f)
-                }
                 drawLine(color = Color(0xFF263238), start = Offset(cx - w * 0.24f, cy - h * 0.35f), end = Offset(cx + w * 0.24f, cy - h * 0.35f), strokeWidth = w * 0.04f, cap = StrokeCap.Round)
-                drawRoundRect(
-                    color = Color(0xFF263238),
-                    topLeft = Offset(cx - w * 0.16f, cy - h * 0.58f),
-                    size = Size(w * 0.32f, h * 0.23f),
-                    cornerRadius = CornerRadius(w * 0.02f, w * 0.02f)
-                )
-                // Red ribbon band
-                drawRect(
-                    color = Color(0xFFE53935),
-                    topLeft = Offset(cx - w * 0.16f, cy - h * 0.41f),
-                    size = Size(w * 0.32f, h * 0.05f)
-                )
+                drawRoundRect(color = Color(0xFF263238), topLeft = Offset(cx - w * 0.16f, cy - h * 0.58f), size = Size(w * 0.32f, h * 0.23f), cornerRadius = CornerRadius(w * 0.02f, w * 0.02f))
+                drawRect(color = Color(0xFFE53935), topLeft = Offset(cx - w * 0.16f, cy - h * 0.41f), size = Size(w * 0.32f, h * 0.05f))
             }
             "CAP" -> {
-                drawRoundRect(
-                    color = Color(0xFF1E88E5),
-                    topLeft = Offset(cx - w * 0.22f, cy - h * 0.48f),
-                    size = Size(w * 0.44f, h * 0.16f),
-                    cornerRadius = CornerRadius(w * 0.1f, w * 0.1f)
-                )
-                // Visor
-                drawLine(
-                    color = Color(0xFF1565C0),
-                    start = Offset(cx - w * 0.25f, cy - h * 0.36f),
-                    end = Offset(cx + w * 0.25f, cy - h * 0.36f),
-                    strokeWidth = w * 0.04f,
-                    cap = StrokeCap.Round
-                )
+                drawRoundRect(color = Color(0xFF1E88E5), topLeft = Offset(cx - w * 0.22f, cy - h * 0.48f), size = Size(w * 0.44f, h * 0.16f), cornerRadius = CornerRadius(w * 0.1f, w * 0.1f))
+                drawLine(color = Color(0xFF1565C0), start = Offset(cx - w * 0.25f, cy - h * 0.36f), end = Offset(cx + w * 0.25f, cy - h * 0.36f), strokeWidth = w * 0.04f, cap = StrokeCap.Round)
             }
             "WITCH" -> {
                 val witchHat = Path().apply {
@@ -332,15 +297,7 @@ fun CartoonPawPrint(
     Canvas(modifier = modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height
-
-        // Main pad
-        drawCircle(
-            color = color,
-            radius = w * 0.28f,
-            center = Offset(w * 0.5f, h * 0.65f)
-        )
-
-        // Toe pads
+        drawCircle(color = color, radius = w * 0.28f, center = Offset(w * 0.5f, h * 0.65f))
         drawCircle(color = color, radius = w * 0.12f, center = Offset(w * 0.22f, h * 0.32f))
         drawCircle(color = color, radius = w * 0.14f, center = Offset(w * 0.40f, h * 0.20f))
         drawCircle(color = color, radius = w * 0.14f, center = Offset(w * 0.60f, h * 0.20f))
@@ -374,7 +331,6 @@ fun FloatingMusicNotes(
                 val offsetPhase = (floatAnim + (index * 0.25f)) % 1f
                 val yOffset = (-15f * kotlin.math.sin(offsetPhase * Math.PI)).toFloat()
                 val alpha = (kotlin.math.sin(offsetPhase * Math.PI)).toFloat().coerceIn(0.2f, 1f)
-
                 Text(
                     text = symbol,
                     fontSize = (18 + (index % 2) * 4).sp,

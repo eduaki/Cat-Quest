@@ -66,8 +66,8 @@ class CatChiptuneSynthesizer {
 
     val availableMelodies = listOf(
         MelodyTrack(
-            name = "Ronrom de Ninar 🌙",
-            icon = "🐱💤",
+            name = "Ronrom de Ninar",
+            icon = "nightlight",
             description = "Melodia suave em caixa de música para acalmar o gatinho",
             tempoBpm = 110,
             notes = listOf(
@@ -80,8 +80,8 @@ class CatChiptuneSynthesizer {
             )
         ),
         MelodyTrack(
-            name = "Patinhas Saltitantes 🐾",
-            icon = "🧶✨",
+            name = "Patinhas Saltitantes",
+            icon = "pets",
             description = "Ritmo alegre de videogame fofo para celebrar as missões",
             tempoBpm = 135,
             notes = listOf(
@@ -96,8 +96,8 @@ class CatChiptuneSynthesizer {
             )
         ),
         MelodyTrack(
-            name = "Brisa dos Bigodes 🌸",
-            icon = "🍃💖",
+            name = "Brisa dos Bigodes",
+            icon = "air",
             description = "Uma valsinha doce e carinhosa de lembranças",
             tempoBpm = 120,
             notes = listOf(
@@ -108,8 +108,8 @@ class CatChiptuneSynthesizer {
             )
         ),
         MelodyTrack(
-            name = "Valsinha das Sonecas 🎶",
-            icon = "💤☁️",
+            name = "Valsinha das Sonecas",
+            icon = "hotel",
             description = "Harmonias serenas para contemplar os momentos do mês",
             tempoBpm = 100,
             notes = listOf(
@@ -120,8 +120,8 @@ class CatChiptuneSynthesizer {
             )
         ),
         MelodyTrack(
-            name = "Aventura do Sachê ✨",
-            icon = "🏆🐟",
+            name = "Aventura do Sachê",
+            icon = "restaurant",
             description = "Marcha alegre e triunfante das missões cumpridas",
             tempoBpm = 130,
             notes = listOf(

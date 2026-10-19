@@ -173,7 +173,7 @@ object PhotoManager {
             isFakeBoldText = true
             textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("🐾 MISSÃO CUMPRIDA! 🐾", cx, height - 120f, textPaint)
+        canvas.drawText("MISSÃO CUMPRIDA!", cx, height - 120f, textPaint)
 
         val titlePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = 0xFFD84315.toInt()
@@ -207,19 +207,19 @@ object PhotoManager {
         samplePhotoPath: String?
     ) {
         val shareText = """
-            🐾✨ Retrospectiva do $catName - $monthName ✨🐾
+            Retrospectiva do $catName - $monthName
             
-            🐱 Total de Missões Cumpridas: $totalMissions
-            📸 Fotos de Comprovação: $totalPhotos
-            🔥 Sequência de Cuidados: $streakDays dias seguidos!
-            💖 Felicidade Felina: 100% de amor e ronrons!
+            Total de Missões Cumpridas: $totalMissions
+            Fotos de Comprovação: $totalPhotos
+            Sequência de Cuidados: $streakDays dias seguidos!
+            Felicidade Felina: 100% de amor e ronrons!
             
-            Cuidado com muito amor pelo app Miau Missões! 🐾💖
+            Cuidado com muito amor pelo app Miau Missões!
         """.trimIndent()
 
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_SUBJECT, "Mural do Mês do $catName 🐾")
+            putExtra(Intent.EXTRA_SUBJECT, "Mural do Mês do $catName")
             putExtra(Intent.EXTRA_TEXT, shareText)
         }
 

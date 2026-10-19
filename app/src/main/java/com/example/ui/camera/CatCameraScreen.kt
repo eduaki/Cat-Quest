@@ -38,12 +38,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Cameraswitch
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FlashAuto
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.NoPhotography
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -71,6 +75,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -86,6 +91,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.data.models.CatMission
 import com.example.ui.components.CartoonCatFace
 import com.example.ui.components.CartoonPawPrint
+import com.example.ui.components.MissionCategoryIcon
 import com.example.ui.theme.CatBrownMuted
 import com.example.ui.theme.CatBrownText
 import com.example.ui.theme.CatMint
@@ -391,9 +397,10 @@ fun CatCameraScreen(
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = mission.getCategoryEnum().iconEmoji,
-                        fontSize = 16.sp
+                    MissionCategoryIcon(
+                        category = mission.getCategoryEnum(),
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
@@ -601,12 +608,16 @@ private fun CameraFallbackPrompt(
                 CartoonCatFace(size = 90.dp)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Câmera Indisponível 🐾",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = CatBrownText
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Câmera Indisponível",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = CatBrownText
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.Default.NoPhotography, contentDescription = null, tint = CatBrownText)
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -627,7 +638,7 @@ private fun CameraFallbackPrompt(
                 ) {
                     Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Escolher Foto da Galeria 🖼️", fontWeight = FontWeight.Bold)
+                    Text("Escolher Foto da Galeria", fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -638,7 +649,9 @@ private fun CameraFallbackPrompt(
                     colors = ButtonDefaults.buttonColors(containerColor = CatMint),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("✨ Gerar Selo Mágico Fofo", fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Gerar Selo Mágico Fofo", fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -721,14 +734,20 @@ private fun CatViewfinderOverlay(
                 .align(Alignment.Center)
                 .padding(horizontal = 40.dp)
         ) {
-            Text(
-                text = "🐾 $missionPrompt",
-                color = Color.White,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-            )
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CartoonPawPrint(size = 18.dp, color = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = missionPrompt,
+                    color = Color.White,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
@@ -772,12 +791,16 @@ private fun CameraPermissionPrompt(
                 CartoonCatFace(size = 90.dp)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Acesso à Câmera 📸",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = CatBrownText
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Acesso à Câmera",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = CatBrownText
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.Default.CameraAlt, contentDescription = null, tint = CatBrownText)
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -796,7 +819,9 @@ private fun CameraPermissionPrompt(
                     colors = ButtonDefaults.buttonColors(containerColor = CatPeachPrimary),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Permitir Uso da Câmera 🐾", fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Pets, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Permitir Uso da Câmera", fontWeight = FontWeight.Bold)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -819,7 +844,9 @@ private fun CameraPermissionPrompt(
                     colors = ButtonDefaults.buttonColors(containerColor = CatMint),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("Escolher Foto da Galeria 🖼️")
+                    Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Escolher Foto da Galeria")
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -830,7 +857,9 @@ private fun CameraPermissionPrompt(
                     colors = ButtonDefaults.buttonColors(containerColor = CatPink),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text("✨ Gerar Selo Mágico Fofo")
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Gerar Selo Mágico Fofo")
                 }
             }
         }

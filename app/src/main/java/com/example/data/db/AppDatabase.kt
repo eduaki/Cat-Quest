@@ -48,6 +48,14 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
     }
 }
 
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        try {
+            db.execSQL("ALTER TABLE cat_profile ADD COLUMN gender TEXT NOT NULL DEFAULT 'Macho'")
+        } catch (_: Exception) {}
+    }
+}
+
 @Database(
     entities = [
         CatMission::class,
@@ -55,7 +63,7 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         ReminderConfig::class,
         CatAffectionMessage::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -75,7 +83,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "miau_cat_care.db"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .fallbackToDestructiveMigration(true)
                     .fallbackToDestructiveMigrationOnDowngrade(true)
                     .build()
