@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Miau Missões"
+rootProject.name = "Cat Quest"
 
 include(":app")

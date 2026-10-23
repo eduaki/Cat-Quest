@@ -88,7 +88,9 @@ fun CatAffectionNotificationManagerSection(
 ) {
     val context = LocalContext.current
     var showAddDialog by remember { mutableStateOf(false) }
-    var selectedIntervalHours by remember { mutableIntStateOf(4) }
+    var selectedIntervalHours by remember {
+        mutableIntStateOf(LocalCatNotificationManager.getAffectionIntervalHours(context))
+    }
     var isListExpanded by remember { mutableStateOf(true) }
 
     Card(
@@ -168,55 +170,101 @@ fun CatAffectionNotificationManagerSection(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Frequency / Interval Selector
-            Text(
-                text = "Intervalo dos Recados Automáticos:",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = CatBrownText
-            )
-
+            // Automatic reminders toggle + frequency selector
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val intervals = listOf(
-                    Pair(2, "A cada 2h"),
-                    Pair(4, "A cada 4h"),
-                    Pair(6, "A cada 6h"),
-                    Pair(8, "2x ao dia")
-                )
-
-                intervals.forEach { (hours, label) ->
-                    val isSelected = selectedIntervalHours == hours
-                    FilterChip(
-                        selected = isSelected,
-                        onClick = {
-                            selectedIntervalHours = hours
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Recados automáticos",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = CatBrownText
+                    )
+                    Text(
+                        text = if (selectedIntervalHours > 0) {
+                            "O $catName manda um recado a cada ${selectedIntervalHours}h, mesmo com o app fechado"
+                        } else {
+                            "Ative para receber recados do $catName em segundo plano"
+                        },
+                        fontSize = 10.sp,
+                        color = CatBrownMuted
+                    )
+                }
+                Switch(
+                    checked = selectedIntervalHours > 0,
+                    onCheckedChange = { enabled ->
+                        val hours = if (enabled) 4 else 0
+                        selectedIntervalHours = hours
+                        if (enabled) {
                             LocalCatNotificationManager.schedulePeriodicAffectionAlarm(
                                 context = context,
                                 intervalHours = hours,
                                 catName = catName
                             )
-                            Toast.makeText(context, "Frequência ajustada para $label!", Toast.LENGTH_SHORT).show()
-                        },
-                        label = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (hours == 4) {
-                                    Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(12.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                }
-                                Text(label, fontSize = 10.sp)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = CatPeachPrimary,
-                            selectedLabelColor = Color.White
-                        )
+                            Toast.makeText(context, "Recados automáticos ativados!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            LocalCatNotificationManager.disablePeriodicAffectionAlarm(context)
+                            Toast.makeText(context, "Recados automáticos desativados.", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = SwitchDefaults.colors(checkedTrackColor = CatPink)
+                )
+            }
+
+            if (selectedIntervalHours > 0) {
+                Text(
+                    text = "Intervalo dos Recados Automáticos:",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = CatBrownText,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val intervals = listOf(
+                        Pair(2, "A cada 2h"),
+                        Pair(4, "A cada 4h"),
+                        Pair(6, "A cada 6h"),
+                        Pair(8, "2x ao dia")
                     )
+
+                    intervals.forEach { (hours, label) ->
+                        val isSelected = selectedIntervalHours == hours
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                selectedIntervalHours = hours
+                                LocalCatNotificationManager.schedulePeriodicAffectionAlarm(
+                                    context = context,
+                                    intervalHours = hours,
+                                    catName = catName
+                                )
+                                Toast.makeText(context, "Frequência ajustada para $label!", Toast.LENGTH_SHORT).show()
+                            },
+                            label = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    if (hours == 4) {
+                                        Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(12.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                    }
+                                    Text(label, fontSize = 10.sp)
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = CatPeachPrimary,
+                                selectedLabelColor = Color.White
+                            )
+                        )
+                    }
                 }
             }
 

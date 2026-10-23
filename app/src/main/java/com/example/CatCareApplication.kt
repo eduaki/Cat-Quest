@@ -4,6 +4,8 @@ import android.app.Application
 import com.example.data.db.AppDatabase
 import com.example.data.repository.CatRepository
 import com.example.notifications.CatNotificationHelper
+import com.example.notifications.LocalCatNotificationManager
+import com.example.notifications.NotificationPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +23,7 @@ class CatCareApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         CatNotificationHelper.createNotificationChannel(this)
-        com.example.notifications.LocalCatNotificationManager.createNotificationChannel(this)
+        LocalCatNotificationManager.createNotificationChannel(this)
 
         database = AppDatabase.getDatabase(this)
         repository = CatRepository(
@@ -37,6 +39,8 @@ class CatCareApplication : Application() {
                 val config = database.reminderConfigDao().getConfigSync()
                 val profile = database.catProfileDao().getProfileSync()
                 if (config != null) {
+                    // Keep the sound preference available to the background receiver.
+                    NotificationPreferences.setSoundEnabled(this@CatCareApplication, config.soundEnabled)
                     CatNotificationHelper.scheduleAlarmsFromConfig(
                         this@CatCareApplication,
                         config,

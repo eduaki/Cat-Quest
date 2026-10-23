@@ -19,8 +19,19 @@ import kotlin.random.Random
 object CatNotificationHelper {
 
     const val CHANNEL_ID = "cat_daily_reminders_channel"
+    const val CHANNEL_ID_SILENT = "cat_daily_reminders_silent_channel"
     const val CHANNEL_NAME = "Lembretes Fofos & Carinho do Gatinho 🐾"
     const val CHANNEL_DESC = "Lembretes amigáveis para cuidar do seu gato, mensagens de afeto e avisos de missões diárias!"
+
+    const val ACTION_CAT_REMINDER = "com.example.notifications.action.CAT_REMINDER"
+
+    const val EXTRA_PERIOD = "EXTRA_PERIOD"
+    const val EXTRA_CAT_NAME = "EXTRA_CAT_NAME"
+    const val EXTRA_TONE = "EXTRA_TONE"
+    const val EXTRA_SOUND_ENABLED = "EXTRA_SOUND_ENABLED"
+    const val EXTRA_HOUR = "EXTRA_HOUR"
+    const val EXTRA_MINUTE = "EXTRA_MINUTE"
+    const val EXTRA_REQUEST_CODE = "EXTRA_REQUEST_CODE"
 
     const val REQ_MORNING = 101
     const val REQ_AFTERNOON = 102
@@ -28,22 +39,42 @@ object CatNotificationHelper {
     const val REQ_SPONTANEOUS_LOVE = 104
     const val REQ_TEST = 999
 
+    private val SOUND_VIBRATION_PATTERN = longArrayOf(0, 200, 100, 200)
+
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val soundChannel = NotificationChannel(
                 CHANNEL_ID,
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = CHANNEL_DESC
                 enableVibration(true)
-                vibrationPattern = longArrayOf(0, 200, 100, 200)
+                vibrationPattern = SOUND_VIBRATION_PATTERN
                 setShowBadge(true)
             }
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.createNotificationChannel(channel)
+
+            // On Android O+ a notification inherits sound/vibration from its channel,
+            // so a separate silent channel is the only way to honour the app setting.
+            val silentChannel = NotificationChannel(
+                CHANNEL_ID_SILENT,
+                "$CHANNEL_NAME (silencioso)",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = CHANNEL_DESC
+                setSound(null, null)
+                enableVibration(false)
+                setShowBadge(true)
+            }
+
+            manager.createNotificationChannels(listOf(soundChannel, silentChannel))
         }
     }
+
+    fun channelIdFor(soundEnabled: Boolean): String =
+        if (soundEnabled) CHANNEL_ID else CHANNEL_ID_SILENT
 
     /**
      * Generates a sweet affectionate reminder message depending on tone and time period.
@@ -148,26 +179,28 @@ object CatNotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val soundUri = if (soundEnabled) RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) else null
-
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+        val builder = NotificationCompat.Builder(context, channelIdFor(soundEnabled))
+            .setSmallIcon(R.drawable.ic_notification_cat)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
             .setContentIntent(openAppPendingIntent)
             .addAction(
-                R.drawable.ic_launcher_foreground,
+                R.drawable.ic_notification_cat,
                 "Ver Missões 🐾",
                 openAppPendingIntent
             )
 
-        if (soundUri != null) {
-            builder.setSound(soundUri)
-        } else {
-            builder.setSilent(true)
+        // Channel settings win on Android O+, so only override sound on older versions.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            if (soundEnabled) {
+                builder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            } else {
+                builder.setSilent(true)
+            }
         }
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -184,13 +217,13 @@ object CatNotificationHelper {
         if (config.morningEnabled) {
             scheduleDailyAlarm(
                 context = context,
-                alarmManager = alarmManager,
                 requestCode = REQ_MORNING,
                 hour = config.morningHour,
                 minute = config.morningMinute,
                 period = "MORNING",
                 catName = catName,
-                tone = config.friendlyTone
+                tone = config.friendlyTone,
+                soundEnabled = config.soundEnabled
             )
         } else {
             cancelAlarm(context, alarmManager, REQ_MORNING)
@@ -200,13 +233,13 @@ object CatNotificationHelper {
         if (config.afternoonEnabled) {
             scheduleDailyAlarm(
                 context = context,
-                alarmManager = alarmManager,
                 requestCode = REQ_AFTERNOON,
                 hour = config.afternoonHour,
                 minute = config.afternoonMinute,
                 period = "AFTERNOON",
                 catName = catName,
-                tone = config.friendlyTone
+                tone = config.friendlyTone,
+                soundEnabled = config.soundEnabled
             )
         } else {
             cancelAlarm(context, alarmManager, REQ_AFTERNOON)
@@ -216,33 +249,47 @@ object CatNotificationHelper {
         if (config.eveningEnabled) {
             scheduleDailyAlarm(
                 context = context,
-                alarmManager = alarmManager,
                 requestCode = REQ_EVENING,
                 hour = config.eveningHour,
                 minute = config.eveningMinute,
                 period = "EVENING",
                 catName = catName,
-                tone = config.friendlyTone
+                tone = config.friendlyTone,
+                soundEnabled = config.soundEnabled
             )
         } else {
             cancelAlarm(context, alarmManager, REQ_EVENING)
         }
     }
 
-    private fun scheduleDailyAlarm(
+    /**
+     * Schedules the next occurrence of a daily reminder.
+     *
+     * Everything needed to re-arm the alarm travels inside the [PendingIntent], so the
+     * background receiver can schedule the following day even if the database is not
+     * reachable (for example right after a reboot or an app update).
+     */
+    fun scheduleDailyAlarm(
         context: Context,
-        alarmManager: AlarmManager,
         requestCode: Int,
         hour: Int,
         minute: Int,
         period: String,
         catName: String,
-        tone: String
+        tone: String,
+        soundEnabled: Boolean = true
     ) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
+
         val intent = Intent(context, CatNotificationReceiver::class.java).apply {
-            putExtra("EXTRA_PERIOD", period)
-            putExtra("EXTRA_CAT_NAME", catName)
-            putExtra("EXTRA_TONE", tone)
+            action = ACTION_CAT_REMINDER
+            putExtra(EXTRA_PERIOD, period)
+            putExtra(EXTRA_CAT_NAME, catName)
+            putExtra(EXTRA_TONE, tone)
+            putExtra(EXTRA_SOUND_ENABLED, soundEnabled)
+            putExtra(EXTRA_HOUR, hour)
+            putExtra(EXTRA_MINUTE, minute)
+            putExtra(EXTRA_REQUEST_CODE, requestCode)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
@@ -252,6 +299,44 @@ object CatNotificationHelper {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val triggerAt = nextTriggerTime(hour, minute)
+
+        try {
+            // Use setAndAllowWhileIdle so reminders fire even when device is in Doze Mode
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            } else {
+                alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    AlarmManager.INTERVAL_DAY,
+                    pendingIntent
+                )
+            }
+        } catch (e: SecurityException) {
+            // In case of permission restriction on Android 12+, fallback to inexact set
+            try {
+                alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pendingIntent
+                )
+            } catch (e2: Exception) {
+                e2.printStackTrace()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Returns the next timestamp matching [hour]:[minute] in the device time zone.
+     */
+    fun nextTriggerTime(hour: Int, minute: Int): Long {
         val calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, hour)
@@ -263,41 +348,19 @@ object CatNotificationHelper {
                 add(Calendar.DAY_OF_YEAR, 1)
             }
         }
+        return calendar.timeInMillis
+    }
 
-        try {
-            // Use setAndAllowWhileIdle so reminders fire even when device is in Doze Mode
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
-            } else {
-                alarmManager.setRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    AlarmManager.INTERVAL_DAY,
-                    pendingIntent
-                )
-            }
-        } catch (e: SecurityException) {
-            // In case of permission restriction on Android 12+, fallback to inexact set
-            try {
-                alarmManager.set(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
-            } catch (e2: Exception) {
-                e2.printStackTrace()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+    fun requestCodeForPeriod(period: String): Int = when (period) {
+        "AFTERNOON" -> REQ_AFTERNOON
+        "EVENING" -> REQ_EVENING
+        else -> REQ_MORNING
     }
 
     private fun cancelAlarm(context: Context, alarmManager: AlarmManager, requestCode: Int) {
-        val intent = Intent(context, CatNotificationReceiver::class.java)
+        val intent = Intent(context, CatNotificationReceiver::class.java).apply {
+            action = ACTION_CAT_REMINDER
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             requestCode,

@@ -1,4 +1,4 @@
-# 🐾 Miau Missões (Cat Quest)
+# 🐾 Cat Quest
 
 Aplicativo Android nativo que transforma o cuidado diário com o gato em um jogo afetivo: **missões diárias comprovadas por foto**, pontos, peixinhos, sequência de dias (streak), lojinha de customização, retrospectiva mensal com trilha sonora e notificações carinhosas.
 
@@ -15,6 +15,7 @@ Aplicativo Android nativo que transforma o cuidado diário com o gato em um jogo
 
 ## 📖 A ideia
 
+Cat Quest
 Quem convive com um gato sabe que os cuidados importantes são pequenos, recorrentes e fáceis de esquecer: trocar a água, servir o sachê, limpar a caixa de areia, brincar, escovar os pelos, dar carinho. O **Miau Missões** existe para:
 
 1. **Lembrar** o tutor desses cuidados nos melhores horários do dia.
@@ -28,19 +29,20 @@ O tom do app é de **acolhimento e brincadeira**, não de cobrança: o gato "fal
 
 ### Princípios do produto
 
-| Princípio | Como aparece no app |
-|---|---|
-| **Local-first / offline** | Todo o estado vive em um banco Room no dispositivo; nenhuma conta ou servidor é necessária. |
-| **Baixa fricção** | Missões padrão já vêm criadas para o dia; a prova é uma foto (câmera, galeria ou selo gerado). |
-| **Privacidade** | As fotos ficam no armazenamento interno do app (`filesDir/cat_photos`). |
-| **Afeto antes de métrica** | Comentários do gato, emojis, paleta pastel e notificações em tom carinhoso. |
-| **Progressão visível** | Barra semanal, streak, nível do tutor, peixinhos e lojinha. |
+| Princípio                  | Como aparece no app                                                                            |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Local-first / offline**  | Todo o estado vive em um banco Room no dispositivo; nenhuma conta ou servidor é necessária.    |
+| **Baixa fricção**          | Missões padrão já vêm criadas para o dia; a prova é uma foto (câmera, galeria ou selo gerado). |
+| **Privacidade**            | As fotos ficam no armazenamento interno do app (`filesDir/cat_photos`).                        |
+| **Afeto antes de métrica** | Comentários do gato, emojis, paleta pastel e notificações em tom carinhoso.                    |
+| **Progressão visível**     | Barra semanal, streak, nível do tutor, peixinhos e lojinha.                                    |
 
 ---
 
 ## ✨ Funcionalidades
 
 ### 1. Missões diárias (`Missões`)
+
 - Seis missões padrão criadas automaticamente por data:
   - 💧 Água fresca
   - 🍽️ Alimentação & sachê
@@ -60,12 +62,14 @@ O tom do app é de **acolhimento e brincadeira**, não de cobrança: o gato "fal
 - Celebração com pontos ganhos, bônus de streak e aviso de level up.
 
 ### 2. Calendário (`Calendário`)
+
 - Grade mensal com navegação entre meses e marcação dos dias com missões concluídas.
 - Seleção de qualquer dia para ver/gerenciar as missões daquela data.
 - Gráfico de barras da semana atual (`WeekMissionsBarChart`).
 - Resumo de sequência (streak) e progresso.
 
 ### 3. Retrospectiva musical (`Música`)
+
 - Carrossel horizontal (`HorizontalPager`) com as fotos do mês, avanço automático e zoom.
 - Estatísticas do período: missões, fotos e streak.
 - **Trilha sonora sintetizada em tempo real** (chiptune) por `CatChiptuneSynthesizer`, com 5 melodias originais e controle de play/mute.
@@ -74,18 +78,21 @@ O tom do app é de **acolhimento e brincadeira**, não de cobrança: o gato "fal
 - Compartilhamento do resumo via `Intent`.
 
 ### 4. Mural de fotos (`Mural`)
+
 - Grade com todas as comprovações fotográficas.
 - Filtro por mês atual ou por todas as fotos.
 - Visualização ampliada com detalhes da missão, data e comentário do gato.
 - Compartilhamento do mural.
 
 ### 5. Lojinha de recompensas (`Lojinha`)
+
 - Três abas: **Acessórios**, **Pelagens** e **Temas**.
 - Compra com peixinhos e equipagem imediata; itens já desbloqueados podem ser reequipados sem custo.
 - Prévia ao vivo do gato cartoon com a pelagem e o acessório equipados.
 - Catálogo declarativo em `RewardCatalog` (`CatProfile.kt`).
 
 ### 6. Lembretes e mensagens de carinho (`Lembretes`)
+
 - Três janelas diárias configuráveis: manhã, tarde e noite (horário e ativação).
 - Três tons de voz do gato: **Carinhoso**, **Brincalhão** e **Exigente**.
 - Som/vibração on/off, solicitação da permissão `POST_NOTIFICATIONS`, teste imediato de notificação.
@@ -94,6 +101,7 @@ O tom do app é de **acolhimento e brincadeira**, não de cobrança: o gato "fal
 - Perfil do gato editável: nome, gênero, raça, petisco favorito e pelagem.
 
 ### 7. Gamificação transversal
+
 - Pontos por missão, bônus por sequência, nível do tutor e moedas.
 - Catálogo com 11 pelagens, 8 opções de acessório (incluindo "nenhum") e 4 temas, alguns gratuitos e outros comprados com peixinhos.
 
@@ -182,14 +190,14 @@ flowchart TB
 
 ### Camadas e responsabilidades
 
-| Camada | Componentes | Responsabilidade |
-|---|---|---|
-| **Entrada / plataforma** | [`CatCareApplication`](app/src/main/java/com/example/CatCareApplication.kt), [`MainActivity`](app/src/main/java/com/example/MainActivity.kt) | Criar banco, repository e canais; reagendar alarmes; hospedar o Compose e a navegação por abas. |
-| **Apresentação** | [`ui/screens`](app/src/main/java/com/example/ui/screens), [`ui/camera`](app/src/main/java/com/example/ui/camera), [`ui/components`](app/src/main/java/com/example/ui/components), [`ui/theme`](app/src/main/java/com/example/ui/theme) | Telas, componentes reutilizáveis, captura de foto, paleta e tipografia. |
-| **Estado** | [`CatCareViewModel`](app/src/main/java/com/example/ui/viewmodel/CatCareViewModel.kt) | Expõe estado derivado (`Flow` → `StateFlow`), trata eventos e dispara operações de dados/notificação. |
-| **Domínio** | [`ScoreCalculator`](app/src/main/java/com/example/utils/ScoreCalculator.kt), [`DateUtils`](app/src/main/java/com/example/utils/DateUtils.kt) | Regras de recompensa, níveis, progresso semanal, formatação de datas e cálculo de streak. |
-| **Infraestrutura local** | [`PhotoManager`](app/src/main/java/com/example/utils/PhotoManager.kt), [`CatChiptuneSynthesizer`](app/src/main/java/com/example/audio/CatChiptuneSynthesizer.kt), [`notifications`](app/src/main/java/com/example/notifications) | Persistência de imagens, síntese de áudio, alarmes e notificações. |
-| **Dados** | [`CatRepository`](app/src/main/java/com/example/data/repository/CatRepository.kt), [`data/db`](app/src/main/java/com/example/data/db), [`data/models`](app/src/main/java/com/example/data/models) | Fonte única de dados, consultas reativas, entidades e catálogo de recompensas. |
+| Camada                   | Componentes                                                                                                                                                                                                                            | Responsabilidade                                                                                      |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Entrada / plataforma** | [`CatCareApplication`](app/src/main/java/com/example/CatCareApplication.kt), [`MainActivity`](app/src/main/java/com/example/MainActivity.kt)                                                                                           | Criar banco, repository e canais; reagendar alarmes; hospedar o Compose e a navegação por abas.       |
+| **Apresentação**         | [`ui/screens`](app/src/main/java/com/example/ui/screens), [`ui/camera`](app/src/main/java/com/example/ui/camera), [`ui/components`](app/src/main/java/com/example/ui/components), [`ui/theme`](app/src/main/java/com/example/ui/theme) | Telas, componentes reutilizáveis, captura de foto, paleta e tipografia.                               |
+| **Estado**               | [`CatCareViewModel`](app/src/main/java/com/example/ui/viewmodel/CatCareViewModel.kt)                                                                                                                                                   | Expõe estado derivado (`Flow` → `StateFlow`), trata eventos e dispara operações de dados/notificação. |
+| **Domínio**              | [`ScoreCalculator`](app/src/main/java/com/example/utils/ScoreCalculator.kt), [`DateUtils`](app/src/main/java/com/example/utils/DateUtils.kt)                                                                                           | Regras de recompensa, níveis, progresso semanal, formatação de datas e cálculo de streak.             |
+| **Infraestrutura local** | [`PhotoManager`](app/src/main/java/com/example/utils/PhotoManager.kt), [`CatChiptuneSynthesizer`](app/src/main/java/com/example/audio/CatChiptuneSynthesizer.kt), [`notifications`](app/src/main/java/com/example/notifications)       | Persistência de imagens, síntese de áudio, alarmes e notificações.                                    |
+| **Dados**                | [`CatRepository`](app/src/main/java/com/example/data/repository/CatRepository.kt), [`data/db`](app/src/main/java/com/example/data/db), [`data/models`](app/src/main/java/com/example/data/models)                                      | Fonte única de dados, consultas reativas, entidades e catálogo de recompensas.                        |
 
 ### Estrutura de pastas
 
@@ -206,8 +214,9 @@ app/src/main/java/com/example/
 │       └── CatRepository.kt       # API de dados para o ViewModel
 ├── notifications/
 │   ├── CatNotificationHelper.kt   # agendamento diário + mensagens por tom
-│   ├── CatNotificationReceiver.kt # broadcast: boot, lembrete e recado de amor
-│   └── LocalCatNotificationManager.kt
+│   ├── CatNotificationReceiver.kt # broadcast: boot, atualização, lembrete e recado de amor
+│   ├── LocalCatNotificationManager.kt
+│   └── NotificationPreferences.kt # intervalo dos recados e preferências do receiver
 ├── ui/
 │   ├── camera/CatCameraScreen.kt  # câmera CameraX e fallbacks
 │   ├── components/                # gato cartoon, ícones, gráfico, seção de recados
@@ -311,14 +320,14 @@ erDiagram
     }
 ```
 
-Não há *foreign keys*: o vínculo entre missão e gato é implícito (perfil único + missões por `date`), o que simplifica o modelo de instância única.
+Não há _foreign keys_: o vínculo entre missão e gato é implícito (perfil único + missões por `date`), o que simplifica o modelo de instância única.
 
-| Tabela | Papel |
-|---|---|
-| `cat_profile` | Linha única (`id = 1`) com identidade, progresso e itens equipados/desbloqueados. |
-| `cat_missions` | Uma linha por missão/data, incluindo prova fotográfica e recompensa recebida. |
-| `reminder_config` | Linha única com as três janelas de lembrete, tom e som. |
-| `cat_affection_messages` | Banco de recados afetivos, nativos ou criados pelo usuário. |
+| Tabela                   | Papel                                                                             |
+| ------------------------ | --------------------------------------------------------------------------------- |
+| `cat_profile`            | Linha única (`id = 1`) com identidade, progresso e itens equipados/desbloqueados. |
+| `cat_missions`           | Uma linha por missão/data, incluindo prova fotográfica e recompensa recebida.     |
+| `reminder_config`        | Linha única com as três janelas de lembrete, tom e som.                           |
+| `cat_affection_messages` | Banco de recados afetivos, nativos ou criados pelo usuário.                       |
 
 ### Migrações
 
@@ -332,34 +341,34 @@ Implementadas em [`ScoreCalculator`](app/src/main/java/com/example/utils/ScoreCa
 
 ### Pontos-base por categoria
 
-| Categoria | Pontos | Peixinhos |
-|---|---:|---:|
-| Água fresca | 40 | 20 |
-| Alimentação & sachê | 40 | 20 |
-| Caixa de areia | 50 | 25 |
-| Brincadeira ativa | 45 | 25 |
-| Escovação & higiene | 45 | 25 |
-| Carinho & ronrom | 50 | 30 |
-| Saúde & checkup | 60 | 35 |
+| Categoria           | Pontos | Peixinhos |
+| ------------------- | -----: | --------: |
+| Água fresca         |     40 |        20 |
+| Alimentação & sachê |     40 |        20 |
+| Caixa de areia      |     50 |        25 |
+| Brincadeira ativa   |     45 |        25 |
+| Escovação & higiene |     45 |        25 |
+| Carinho & ronrom    |     50 |        30 |
+| Saúde & checkup     |     60 |        35 |
 
 ### Bônus de sequência (streak)
 
-| Dias consecutivos | Multiplicador de pontos | Bônus em peixinhos |
-|---|---:|---|
-| 3 a 6 | 1,2× | `min(streak × 2, 20)` |
-| 7 a 13 | 1,5× | `min(streak × 2, 20)` |
-| 14+ | 2,0× | `min(streak × 2, 20)` |
+| Dias consecutivos | Multiplicador de pontos | Bônus em peixinhos    |
+| ----------------- | ----------------------: | --------------------- |
+| 3 a 6             |                    1,2× | `min(streak × 2, 20)` |
+| 7 a 13            |                    1,5× | `min(streak × 2, 20)` |
+| 14+               |                    2,0× | `min(streak × 2, 20)` |
 
 ### Níveis do tutor
 
-| Nível | Pontuação mínima | Título |
-|---:|---:|---|
-| 1 | 0 | Tutor Iniciante 🐾 |
-| 2 | 200 | Amigo dos Bigodes 🐱 |
-| 3 | 500 | Cuidador Dedicado ✨ |
-| 4 | 1.000 | Encantador de Gatos 💖 |
-| 5 | 1.800 | Mestre do Ronrom 😻 |
-| 6 | 3.000 | Lorde Protetor Felino 👑 |
+| Nível | Pontuação mínima | Título                   |
+| ----: | ---------------: | ------------------------ |
+|     1 |                0 | Tutor Iniciante 🐾       |
+|     2 |              200 | Amigo dos Bigodes 🐱     |
+|     3 |              500 | Cuidador Dedicado ✨     |
+|     4 |            1.000 | Encantador de Gatos 💖   |
+|     5 |            1.800 | Mestre do Ronrom 😻      |
+|     6 |            3.000 | Lorde Protetor Felino 👑 |
 
 ### Economia e desbloqueio
 
@@ -372,19 +381,21 @@ Implementadas em [`ScoreCalculator`](app/src/main/java/com/example/utils/ScoreCa
 
 ## 🔔 Notificações
 
-Dois canais independentes:
+Quatro canais — cada canal tem uma variante silenciosa, escolhida pelo switch de som:
 
-| Canal | ID | Uso |
-|---|---|---|
-| Lembretes diários | `cat_daily_reminders_channel` | Três alarmes por dia (manhã/tarde/noite) com mensagens por período e tom. |
-| Carinho & incentivo | `cat_affection_encouragement_channel` | Recados afetivos periódicos e envio manual, com ações "Mandar Cafuné" e "Ver Missões". |
+| Canal               | IDs                                                          | Uso                                                                                    |
+| ------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Lembretes diários   | `cat_daily_reminders_channel` / `cat_daily_reminders_silent_channel`         | Três alarmes por dia (manhã/tarde/noite) com mensagens por período e tom.              |
+| Carinho & incentivo | `cat_affection_encouragement_channel` / `cat_affection_encouragement_silent_channel` | Recados afetivos periódicos e envio manual, com ações "Mandar Cafuné" e "Ver Missões". |
 
-Funcionamento:
+Funcionamento (em segundo plano):
 
-- [`CatNotificationHelper`](app/src/main/java/com/example/notifications/CatNotificationHelper.kt) converte `ReminderConfig` em `PendingIntent`s e agenda com `AlarmManager` (`setAndAllowWhileIdle`, com fallback inexato).
-- [`CatNotificationReceiver`](app/src/main/java/com/example/notifications/CatNotificationReceiver.kt) trata três casos: `BOOT_COMPLETED` (reagenda), recado de amor e lembrete padrão (reenvia e reagenda o próximo dia).
+- [`CatNotificationHelper`](app/src/main/java/com/example/notifications/CatNotificationHelper.kt) converte `ReminderConfig` em `PendingIntent`s e agenda com `AlarmManager` (`setAndAllowWhileIdle`, com fallback inexato). O alarme é do sistema, então dispara mesmo com o app fechado ou removido dos recentes.
+- Cada alarme carrega no próprio `Intent` hora, minuto, tom, nome do gato e preferência de som. Assim o [`CatNotificationReceiver`](app/src/main/java/com/example/notifications/CatNotificationReceiver.kt) envia a notificação e reagenda o dia seguinte sem depender do banco.
+- O receiver é `exported="false"` e trata `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED` (atualização do app), `TIME_SET` e `TIMEZONE_CHANGED`, reconstruindo todos os alarmes a partir do `ReminderConfig`.
+- `POST_NOTIFICATIONS` é solicitada na primeira abertura (Android 13+); a tela **Lembretes** mantém um atalho para reautorizar.
+- Recados automáticos são opt-in: o switch "Recados automáticos" grava o intervalo (2, 4, 6 ou 8 h) em `SharedPreferences` via [`NotificationPreferences`](app/src/main/java/com/example/notifications/NotificationPreferences.kt), e o receiver o restaura após reboot ou atualização.
 - Mensagens usam o nome do gato e o placeholder `{gato}`; o tom (`CARINHOSO`, `BRINCALHAO`, `RECLAMAO_FOFO`) e o período mudam o texto.
-- Interstício de recados automáticos: 2, 4, 6 ou 8 horas, configurado na seção de mensagens.
 
 Permissões declaradas no manifesto: `POST_NOTIFICATIONS`, `CAMERA`, `VIBRATE` e `RECEIVE_BOOT_COMPLETED`.
 
@@ -426,32 +437,32 @@ Permissões declaradas no manifesto: `POST_NOTIFICATIONS`, `CAMERA`, `VIBRATE` e
 
 ## 🧰 Stack e dependências
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| Kotlin | 2.2.10 | Linguagem e plugin Compose |
-| Android Gradle Plugin | 9.1.0-alpha03 | Build Android |
-| Gradle | 9.3.1 | Build system |
-| compileSdk / targetSdk | 36 | API alvo |
-| minSdk | 24 | Android 7.0+ |
-| Jetpack Compose BOM | 2024.09.00 | UI declarativa |
-| Material 3 | BOM | Componentes e tema |
-| Lifecycle / ViewModel Compose | 2.8.7 | Estado com ciclo de vida |
-| Room | 2.7.0 (KSP) | Banco local e DAOs reativos |
-| CameraX | 1.5.0 | Câmera |
-| Coil | 2.7.0 | Carregamento de imagens |
-| Firebase BOM | 34.17.0 | Base para AI/App Check |
-| Firebase App Check | BOM | reCAPTCHA / debug token |
-| Coroutines | 1.10.2 | Concorrência e `Flow` |
-| JUnit 4 / Robolectric | 4.13.2 / 4.16.1 | Testes |
-| Compose UI Test / Espresso | BOM / 3.7.0 | Testes instrumentados |
+| Tecnologia                    | Versão          | Uso                         |
+| ----------------------------- | --------------- | --------------------------- |
+| Kotlin                        | 2.2.10          | Linguagem e plugin Compose  |
+| Android Gradle Plugin         | 9.1.0-alpha03   | Build Android               |
+| Gradle                        | 9.3.1           | Build system                |
+| compileSdk / targetSdk        | 36              | API alvo                    |
+| minSdk                        | 24              | Android 7.0+                |
+| Jetpack Compose BOM           | 2024.09.00      | UI declarativa              |
+| Material 3                    | BOM             | Componentes e tema          |
+| Lifecycle / ViewModel Compose | 2.8.7           | Estado com ciclo de vida    |
+| Room                          | 2.7.0 (KSP)     | Banco local e DAOs reativos |
+| CameraX                       | 1.5.0           | Câmera                      |
+| Coil                          | 2.7.0           | Carregamento de imagens     |
+| Firebase BOM                  | 34.17.0         | Base para AI/App Check      |
+| Firebase App Check            | BOM             | reCAPTCHA / debug token     |
+| Coroutines                    | 1.10.2          | Concorrência e `Flow`       |
+| JUnit 4 / Robolectric         | 4.13.2 / 4.16.1 | Testes                      |
+| Compose UI Test / Espresso    | BOM / 3.7.0     | Testes instrumentados       |
 
 Identificadores do módulo:
 
 - `namespace`: `com.example`
-- `applicationId`: `com.aistudio.miaumissoes.kcqtzp`
+- `applicationId`: `comCat Questaumissoes.kcqtzp`
 - `rootProject.name`: `Miau Missões`
 
-Dependências já declaradas, mas **ainda não conectadas** ao fluxo atual: Firebase AI (Gemini), Retrofit, OkHttp, Moshi e logging interceptor. O plugin de *secrets* lê `.env`/`.env.example`, e o `google-services` está configurado para apenas avisar quando `google-services.json` não existir.
+Dependências já declaradas, mas **ainda não conectadas** ao fluxo atual: Firebase AI (Gemini), Retrofit, OkHttp, Moshi e logging interceptor. O plugin de _secrets_ lê `.env`/`.env.example`, e o `google-services` está configurado para apenas avisar quando `google-services.json` não existir.
 
 ---
 
@@ -467,7 +478,7 @@ Dependências já declaradas, mas **ainda não conectadas** ao fluxo atual: Fire
 ### Pelo Android Studio
 
 1. Abra a pasta do projeto.
-2. Aguarde o *Gradle sync*. Se solicitado, informe o caminho do SDK (ou crie `local.properties` com `sdk.dir=...`).
+2. Aguarde o _Gradle sync_. Se solicitado, informe o caminho do SDK (ou crie `local.properties` com `sdk.dir=...`).
 3. Selecione o módulo `app` e execute em um dispositivo/emulador.
 
 ### Por linha de comando
@@ -484,21 +495,21 @@ Ou use o Gradle embutido do Android Studio.
 
 ### Configuração opcional
 
-| Arquivo | Necessidade | Observação |
-|---|---|---|
-| `local.properties` | Sim | Aponta `sdk.dir` para o SDK Android; não é versionado. |
-| `.env` | Não | Copie de `.env.example` ao integrar o Gemini/Firebase AI. |
-| `google-services.json` | Não | O build segue com aviso (`MissingGoogleServicesStrategy.WARN`). |
-| `my-upload-key.jks` + variáveis `KEYSTORE_PATH`, `STORE_PASSWORD`, `KEY_PASSWORD` | Apenas release | Assinatura de release; o keystore não é versionado. |
+| Arquivo                                                                           | Necessidade    | Observação                                                      |
+| --------------------------------------------------------------------------------- | -------------- | --------------------------------------------------------------- |
+| `local.properties`                                                                | Sim            | Aponta `sdk.dir` para o SDK Android; não é versionado.          |
+| `.env`                                                                            | Não            | Copie de `.env.example` ao integrar o Gemini/Firebase AI.       |
+| `google-services.json`                                                            | Não            | O build segue com aviso (`MissingGoogleServicesStrategy.WARN`). |
+| `my-upload-key.jks` + variáveis `KEYSTORE_PATH`, `STORE_PASSWORD`, `KEY_PASSWORD` | Apenas release | Assinatura de release; o keystore não é versionado.             |
 
 ---
 
 ## 🧪 Testes
 
-| Tipo | Local | Conteúdo atual |
-|---|---|---|
-| Unitário | [`app/src/test`](app/src/test/java/com/example) | Exemplo de soma e leitura de string com Robolectric. |
-| Instrumentado | [`app/src/androidTest`](app/src/androidTest/java/com/example) | Exemplo de teste de instrumentação. |
+| Tipo          | Local                                                         | Conteúdo atual                                       |
+| ------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
+| Unitário      | [`app/src/test`](app/src/test/java/com/example)               | Exemplo de soma e leitura de string com Robolectric. |
+| Instrumentado | [`app/src/androidTest`](app/src/androidTest/java/com/example) | Exemplo de teste de instrumentação.                  |
 
 ```powershell
 .\gradlew.bat :app:testDebugUnitTest
@@ -524,8 +535,9 @@ As regras de pontuação, streak e cálculo de datas são boas candidatas a test
 - **Sem sincronização em nuvem**: não há login, Firestore ou multidispositivo.
 - **Atomicidade**: conclusão/desfazer missão atualiza missão e perfil em operações separadas; envolver em transação Room é uma melhoria.
 - **Alarmes inexatos**: `setAndAllowWhileIdle` prioriza compatibilidade com Doze; OEMs agressivos podem atrasar notificações.
+- **Force-stop**: ao "forçar parada" o Android cancela os alarmes; eles voltam na próxima abertura do app ou após reiniciar o aparelho.
 - **Build alpha**: AGP 9.1.0-alpha03 e ausência de wrapper scripts exigem atenção no setup.
-- **Cobertura de testes** ainda é de exemplo; faltam testes de ViewModel, repositório e regras de negócio.
+- **Cobertura de testes**: agendamento/entrega das notificações tem testes Robolectric ([`CatNotificationBackgroundTest`](app/src/test/java/com/example/notifications/CatNotificationBackgroundTest.kt)); ainda faltam testes de ViewModel e repositório.
 - **Internacionalização**: textos estão em pt-BR diretamente no código; extrair para `strings.xml` facilitaria outros idiomas.
 
 ---

@@ -214,7 +214,7 @@ object PhotoManager {
             Sequência de Cuidados: $streakDays dias seguidos!
             Felicidade Felina: 100% de amor e ronrons!
             
-            Cuidado com muito amor pelo app Miau Missões!
+            Cuidado com muito amor pelo app Cat Quest!
         """.trimIndent()
 
         val intent = Intent(Intent.ACTION_SEND).apply {
