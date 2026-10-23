@@ -1,10 +1,15 @@
 package com.example
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -26,6 +31,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,10 +39,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import com.example.notifications.NotificationPreferences
 import com.example.ui.screens.CalendarScreen
 import com.example.ui.screens.DailyMissionsScreen
 import com.example.ui.screens.MonthRecapCarouselScreen
@@ -80,6 +89,8 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent(viewModel: CatCareViewModel) {
+    RequestNotificationPermissionOnce()
+
     var currentScreen by remember { mutableStateOf(AppScreen.MISSIONS) }
     var hideBottomBar by remember { mutableStateOf(false) }
 
@@ -199,4 +210,33 @@ fun MainContent(viewModel: CatCareViewModel) {
 @Composable
 fun RewardsShopShopScreen(viewModel: CatCareViewModel, modifier: Modifier) {
     RewardsShopScreen(viewModel, modifier)
+}
+
+/**
+ * Asks for [Manifest.permission.POST_NOTIFICATIONS] on the first launch (Android 13+),
+ * so the scheduled background reminders are actually delivered. The user can still
+ * re-enable them later from the "Lembretes" screen.
+ */
+@Composable
+private fun RequestNotificationPermissionOnce() {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { _ ->
+        NotificationPreferences.markNotificationPermissionRequested(context)
+    }
+
+    LaunchedEffect(Unit) {
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!granted && !NotificationPreferences.wasNotificationPermissionRequested(context)) {
+            NotificationPreferences.markNotificationPermissionRequested(context)
+            launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 }

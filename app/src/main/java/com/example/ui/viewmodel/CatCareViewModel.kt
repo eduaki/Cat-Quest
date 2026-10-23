@@ -13,6 +13,7 @@ import com.example.data.models.MissionCategory
 import com.example.data.models.ReminderConfig
 import com.example.data.repository.CatRepository
 import com.example.notifications.CatNotificationHelper
+import com.example.notifications.NotificationPreferences
 import com.example.utils.DateUtils
 import com.example.utils.PhotoManager
 import java.util.Locale
@@ -250,6 +251,7 @@ class CatCareViewModel(application: Application) : AndroidViewModel(application)
     fun updateReminderConfig(config: ReminderConfig) {
         viewModelScope.launch {
             repository.updateReminderConfig(config)
+            NotificationPreferences.setSoundEnabled(getApplication(), config.soundEnabled)
             CatNotificationHelper.scheduleAlarmsFromConfig(
                 getApplication(),
                 config,
