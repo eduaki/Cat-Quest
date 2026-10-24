@@ -22,11 +22,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.Celebration
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Checkroom
 import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.ContentCut
-import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.LocalFlorist
@@ -35,7 +32,6 @@ import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.ScubaDiving
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.TheaterComedy
@@ -45,8 +41,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -66,10 +60,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.utils.ScoreCalculator
+import com.example.data.models.CatProfile
 import com.example.data.models.RewardCatalog
 import com.example.data.models.RewardType
 import com.example.data.models.ShopRewardItem
@@ -84,6 +80,7 @@ import com.example.ui.theme.CatPink
 import com.example.ui.theme.CatPinkLight
 import com.example.ui.theme.CatVanilla
 import com.example.ui.theme.CatYellow
+import com.example.ui.theme.MyApplicationTheme
 import com.example.ui.viewmodel.CatCareViewModel
 
 @Composable
@@ -92,6 +89,20 @@ fun RewardsShopScreen(
     modifier: Modifier = Modifier
 ) {
     val profile by viewModel.profile.collectAsStateWithLifecycle()
+    
+    RewardsShopContent(
+        profile = profile,
+        onBuyOrEquip = { viewModel.buyOrEquipReward(it) },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun RewardsShopContent(
+    profile: CatProfile,
+    onBuyOrEquip: (ShopRewardItem) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var selectedTab by remember { mutableIntStateOf(0) }
 
     val categories = listOf("Acessórios", "Pelagens", "Temas")
@@ -278,7 +289,7 @@ fun RewardsShopScreen(
                 isEquipped = isEquipped,
                 canAfford = canAfford,
                 onBuyOrEquip = {
-                    viewModel.buyOrEquipReward(item)
+                    onBuyOrEquip(item)
                 }
             )
         }
@@ -325,12 +336,16 @@ private fun RewardItemCard(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = getRewardIcon(item.iconName),
-                    contentDescription = null,
-                    modifier = Modifier.size(28.dp),
-                    tint = if (isEquipped) CatMint else CatPeachPrimary
-                )
+                if (item.type == RewardType.SKIN) {
+                    SkinColorIcon(skinType = item.id)
+                } else {
+                    Icon(
+                        imageVector = getRewardIcon(item.iconName),
+                        contentDescription = null,
+                        modifier = Modifier.size(28.dp),
+                        tint = if (isEquipped) CatMint else CatPeachPrimary
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(14.dp))
@@ -417,6 +432,64 @@ private fun RewardItemCard(
     }
 }
 
+@Composable
+private fun SkinColorIcon(skinType: String) {
+    val baseColor = when (skinType) {
+        "GINGER" -> Color(0xFFFFB74D)
+        "BLACK", "TUXEDO" -> Color(0xFF37474F)
+        "SIAMESE" -> Color(0xFFFFF8E7)
+        "CALICO" -> Color(0xFFFFFDF8)
+        "TABBY" -> Color(0xFFBDBDBD)
+        else -> Color.White
+    }
+    val markingColor = when (skinType) {
+        "SIAMESE", "SPOTTED_BROWN" -> Color(0xFF5D4037)
+        "CALICO" -> Color(0xFFFF9800)
+        "SPOTTED_BLACK" -> Color(0xFF212121)
+        "TABBY", "SPOTTED_GRAY" -> Color(0xFF757575)
+        "SPOTTED_ORANGE" -> Color(0xFFFF9800)
+        else -> null
+    }
+
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            .clip(CircleShape)
+            .background(baseColor)
+            .border(1.dp, CatBrownMuted.copy(alpha = 0.45f), CircleShape)
+    ) {
+        if (markingColor != null) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(3.dp)
+                    .size(9.dp)
+                    .clip(CircleShape)
+                    .background(markingColor)
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(3.dp)
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (skinType == "CALICO") Color(0xFF37474F) else markingColor
+                    )
+            )
+        } else if (skinType == "TUXEDO") {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 3.dp)
+                    .size(width = 10.dp, height = 12.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(Color.White)
+            )
+        }
+    }
+}
+
 private fun getRewardIcon(iconName: String): ImageVector {
     return when (iconName) {
         "pets" -> Icons.Default.Pets
@@ -433,5 +506,22 @@ private fun getRewardIcon(iconName: String): ImageVector {
         "nights_stay" -> Icons.Default.NightsStay
         "circle" -> Icons.Default.Circle
         else -> Icons.Default.ShoppingBag
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RewardsShopScreenPreview() {
+    MyApplicationTheme {
+        RewardsShopContent(
+            profile = CatProfile(
+                fishCoins = 500,
+                pawsCount = 12,
+                totalScore = 1250,
+                level = 3,
+                equippedSkin = "SIAMESE"
+            ),
+            onBuyOrEquip = {}
+        )
     }
 }
