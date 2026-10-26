@@ -284,6 +284,153 @@ fun CartoonCatFace(
                     drawCircle(color = Color.White, radius = w * 0.02f, center = Offset(cx + offsets[i], flowerY))
                 }
             }
+            "BRAZIL_BANDANA" -> {
+                val bandanaY = cy - h * 0.25f
+                drawRoundRect(
+                    color = Color(0xFF009739),
+                    topLeft = Offset(cx - w * 0.34f, bandanaY),
+                    size = Size(w * 0.68f, h * 0.11f),
+                    cornerRadius = CornerRadius(w * 0.03f, w * 0.03f)
+                )
+                val flagDiamond = Path().apply {
+                    moveTo(cx, bandanaY + h * 0.012f)
+                    lineTo(cx + w * 0.12f, bandanaY + h * 0.055f)
+                    lineTo(cx, bandanaY + h * 0.098f)
+                    lineTo(cx - w * 0.12f, bandanaY + h * 0.055f)
+                    close()
+                }
+                drawPath(flagDiamond, color = Color(0xFFFFDF00))
+                drawCircle(
+                    color = Color(0xFF002776),
+                    radius = w * 0.035f,
+                    center = Offset(cx, bandanaY + h * 0.055f)
+                )
+                val bandanaTie = Path().apply {
+                    moveTo(cx + w * 0.32f, bandanaY + h * 0.02f)
+                    lineTo(cx + w * 0.44f, bandanaY - h * 0.015f)
+                    lineTo(cx + w * 0.40f, bandanaY + h * 0.10f)
+                    close()
+                }
+                drawPath(bandanaTie, color = Color(0xFF009739))
+            }
+        }
+    }
+}
+
+@Composable
+fun CartoonAccessoryIcon(
+    accessoryType: String,
+    modifier: Modifier = Modifier,
+    size: Dp = 36.dp
+) {
+    Canvas(modifier = modifier.size(size)) {
+        val unit = this.size.minDimension
+        val cx = this.size.width / 2f
+        val cy = this.size.height / 2f
+        val outline = Color(0xFF5D4037)
+
+        when (accessoryType) {
+            "BOW" -> {
+                val bow = Path().apply {
+                    moveTo(cx, cy)
+                    lineTo(cx - unit * 0.42f, cy - unit * 0.30f)
+                    lineTo(cx - unit * 0.42f, cy + unit * 0.30f)
+                    close()
+                    moveTo(cx, cy)
+                    lineTo(cx + unit * 0.42f, cy - unit * 0.30f)
+                    lineTo(cx + unit * 0.42f, cy + unit * 0.30f)
+                    close()
+                }
+                drawPath(bow, CatPink)
+                drawCircle(Color(0xFFFF4081), unit * 0.10f, Offset(cx, cy))
+            }
+            "CROWN" -> {
+                val crown = Path().apply {
+                    moveTo(cx - unit * 0.40f, cy + unit * 0.30f)
+                    lineTo(cx - unit * 0.46f, cy - unit * 0.28f)
+                    lineTo(cx - unit * 0.18f, cy - unit * 0.08f)
+                    lineTo(cx, cy - unit * 0.44f)
+                    lineTo(cx + unit * 0.18f, cy - unit * 0.08f)
+                    lineTo(cx + unit * 0.46f, cy - unit * 0.28f)
+                    lineTo(cx + unit * 0.40f, cy + unit * 0.30f)
+                    close()
+                }
+                drawPath(crown, Color(0xFFFFD54F))
+                drawPath(crown, outline, style = Stroke(width = unit * 0.05f))
+                drawCircle(Color(0xFFE91E63), unit * 0.06f, Offset(cx, cy + unit * 0.06f))
+            }
+            "TOPHAT" -> {
+                drawRoundRect(
+                    Color(0xFF263238),
+                    Offset(cx - unit * 0.27f, cy - unit * 0.42f),
+                    Size(unit * 0.54f, unit * 0.68f),
+                    CornerRadius(unit * 0.05f, unit * 0.05f)
+                )
+                drawRoundRect(
+                    Color(0xFFE53935),
+                    Offset(cx - unit * 0.27f, cy + unit * 0.04f),
+                    Size(unit * 0.54f, unit * 0.12f),
+                    CornerRadius(unit * 0.02f, unit * 0.02f)
+                )
+                drawLine(outline, Offset(cx - unit * 0.45f, cy + unit * 0.28f), Offset(cx + unit * 0.45f, cy + unit * 0.28f), unit * 0.08f, cap = StrokeCap.Round)
+            }
+            "CAP" -> {
+                drawRoundRect(
+                    Color(0xFF1E88E5),
+                    Offset(cx - unit * 0.38f, cy - unit * 0.28f),
+                    Size(unit * 0.76f, unit * 0.42f),
+                    CornerRadius(unit * 0.18f, unit * 0.18f)
+                )
+                drawLine(Color(0xFF1565C0), Offset(cx - unit * 0.46f, cy + unit * 0.18f), Offset(cx + unit * 0.46f, cy + unit * 0.18f), unit * 0.10f, cap = StrokeCap.Round)
+            }
+            "WITCH" -> {
+                val hat = Path().apply {
+                    moveTo(cx - unit * 0.38f, cy + unit * 0.22f)
+                    lineTo(cx, cy - unit * 0.46f)
+                    lineTo(cx + unit * 0.38f, cy + unit * 0.22f)
+                    close()
+                }
+                drawPath(hat, Color(0xFF5E35B1))
+                drawLine(Color(0xFF4527A0), Offset(cx - unit * 0.46f, cy + unit * 0.22f), Offset(cx + unit * 0.46f, cy + unit * 0.22f), unit * 0.08f, cap = StrokeCap.Round)
+                drawCircle(Color(0xFFFFD54F), unit * 0.07f, Offset(cx, cy + unit * 0.08f))
+            }
+            "FLOWERS" -> {
+                val petalColors = listOf(Color(0xFFFF80AB), Color(0xFFFFD54F), Color(0xFF80DEEA))
+                for (i in petalColors.indices) {
+                    val x = cx + (i - 1) * unit * 0.30f
+                    drawCircle(petalColors[i], unit * 0.20f, Offset(x, cy))
+                    drawCircle(Color.White, unit * 0.07f, Offset(x, cy))
+                }
+                drawLine(Color(0xFF388E3C), Offset(cx - unit * 0.45f, cy + unit * 0.30f), Offset(cx + unit * 0.45f, cy + unit * 0.30f), unit * 0.06f, cap = StrokeCap.Round)
+            }
+            "SUNGLASSES" -> {
+                drawRoundRect(Color(0xFF212121), Offset(cx - unit * 0.46f, cy - unit * 0.20f), Size(unit * 0.40f, unit * 0.38f), CornerRadius(unit * 0.08f, unit * 0.08f))
+                drawRoundRect(Color(0xFF212121), Offset(cx + unit * 0.06f, cy - unit * 0.20f), Size(unit * 0.40f, unit * 0.38f), CornerRadius(unit * 0.08f, unit * 0.08f))
+                drawLine(outline, Offset(cx - unit * 0.08f, cy - unit * 0.04f), Offset(cx + unit * 0.08f, cy - unit * 0.04f), unit * 0.06f)
+            }
+            "BRAZIL_BANDANA" -> {
+                val band = Path().apply {
+                    moveTo(cx - unit * 0.46f, cy - unit * 0.24f)
+                    quadraticTo(cx, cy - unit * 0.40f, cx + unit * 0.46f, cy - unit * 0.24f)
+                    lineTo(cx + unit * 0.40f, cy + unit * 0.28f)
+                    quadraticTo(cx, cy + unit * 0.12f, cx - unit * 0.40f, cy + unit * 0.28f)
+                    close()
+                }
+                drawPath(band, Color(0xFF009739))
+                val diamond = Path().apply {
+                    moveTo(cx, cy - unit * 0.24f)
+                    lineTo(cx + unit * 0.28f, cy + unit * 0.02f)
+                    lineTo(cx, cy + unit * 0.28f)
+                    lineTo(cx - unit * 0.28f, cy + unit * 0.02f)
+                    close()
+                }
+                drawPath(diamond, Color(0xFFFFDF00))
+                drawCircle(Color(0xFF002776), unit * 0.10f, Offset(cx, cy + unit * 0.02f))
+            }
+            else -> {
+                drawCircle(outline.copy(alpha = 0.25f), unit * 0.38f, Offset(cx, cy), style = Stroke(width = unit * 0.08f))
+                drawLine(outline.copy(alpha = 0.5f), Offset(cx - unit * 0.28f, cy + unit * 0.28f), Offset(cx + unit * 0.28f, cy - unit * 0.28f), unit * 0.08f, cap = StrokeCap.Round)
+            }
         }
     }
 }

@@ -131,7 +131,7 @@ fun RemindersSettingsScreen(
     var petBreed by remember(profile.breed) { mutableStateOf(profile.breed) }
     var petSnack by remember(profile.favoriteSnack) { mutableStateOf(profile.favoriteSnack) }
     var petSkin by remember(profile.equippedSkin) { mutableStateOf(profile.equippedSkin) }
-    
+
     var isEditingProfile by remember { mutableStateOf(false) }
     var genderExpanded by remember { mutableStateOf(false) }
 
@@ -352,7 +352,12 @@ fun RemindersSettingsScreen(
                             color = CatBrownText
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Icon(Icons.Default.Pets, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(18.dp))
+                        Icon(
+                            Icons.Default.Pets,
+                            contentDescription = null,
+                            tint = CatBrownText,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
                     Text(
                         text = "Personalize o jeitinho que o gato fala com você:",
@@ -479,7 +484,10 @@ fun RemindersSettingsScreen(
         }
 
         item {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+            ) {
                 Text(
                     text = "Horários dos Lembretes Diários",
                     fontWeight = FontWeight.Bold,
@@ -487,7 +495,12 @@ fun RemindersSettingsScreen(
                     color = CatBrownText
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Icon(Icons.Default.Alarm, contentDescription = null, tint = CatBrownText, modifier = Modifier.size(20.dp))
+                Icon(
+                    Icons.Default.Alarm,
+                    contentDescription = null,
+                    tint = CatBrownText,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
 
@@ -577,7 +590,11 @@ fun RemindersSettingsScreen(
                             },
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Icon(if (isEditingProfile) Icons.Default.Check else Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(
+                                if (isEditingProfile) Icons.Default.Check else Icons.Default.Settings,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(if (isEditingProfile) "Salvar" else "Editar")
                         }
@@ -596,7 +613,7 @@ fun RemindersSettingsScreen(
                             singleLine = true
                         )
                         Spacer(modifier = Modifier.height(10.dp))
-                        
+
                         // Gender Selector
                         ExposedDropdownMenuBox(
                             expanded = genderExpanded,
@@ -615,7 +632,7 @@ fun RemindersSettingsScreen(
                                 expanded = genderExpanded,
                                 onDismissRequest = { genderExpanded = false }
                             ) {
-                                listOf("Macho", "Fêmea", "Outro").forEach { gender ->
+                                listOf("Macho", "Fêmea").forEach { gender ->
                                     DropdownMenuItem(
                                         text = { Text(gender) },
                                         onClick = {
@@ -626,7 +643,7 @@ fun RemindersSettingsScreen(
                                 }
                             }
                         }
-                        
+
                         Spacer(modifier = Modifier.height(10.dp))
                         OutlinedTextField(
                             value = petBreed,
@@ -645,9 +662,9 @@ fun RemindersSettingsScreen(
                             shape = RoundedCornerShape(12.dp),
                             singleLine = true
                         )
-                        
+
                         Spacer(modifier = Modifier.height(16.dp))
-                        
+
                         // Skin Selector
                         Text(
                             text = "Escolha a Pelagem:",
@@ -656,7 +673,7 @@ fun RemindersSettingsScreen(
                             color = CatBrownText,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
-                        
+
                         LazyRow(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                             modifier = Modifier.fillMaxWidth()

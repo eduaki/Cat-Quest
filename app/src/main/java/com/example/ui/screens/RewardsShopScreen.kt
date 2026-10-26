@@ -70,6 +70,7 @@ import com.example.data.models.RewardCatalog
 import com.example.data.models.RewardType
 import com.example.data.models.ShopRewardItem
 import com.example.ui.components.CartoonCatFace
+import com.example.ui.components.CartoonAccessoryIcon
 import com.example.ui.components.CartoonPawPrint
 import com.example.ui.theme.CatBrownMuted
 import com.example.ui.theme.CatBrownText
@@ -338,6 +339,8 @@ private fun RewardItemCard(
             ) {
                 if (item.type == RewardType.SKIN) {
                     SkinColorIcon(skinType = item.id)
+                } else if (item.type == RewardType.ACCESSORY) {
+                    CartoonAccessoryIcon(accessoryType = item.id)
                 } else {
                     Icon(
                         imageVector = getRewardIcon(item.iconName),
