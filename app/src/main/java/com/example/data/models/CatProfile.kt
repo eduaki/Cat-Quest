@@ -17,7 +17,7 @@ data class CatProfile(
     val level: Int = 1, // Caregiver level
     val fishCoins: Int = 100, // Starter bonus!
     val pawsCount: Int = 0, // Total missions completed with photo
-    val equippedAccessory: String = "NONE", // NONE, BOW, CROWN, TOPHAT, CAP, WITCH, FLOWERS, SUNGLASSES
+    val equippedAccessory: String = "NONE", // NONE, BOW, CROWN, TOPHAT, CAP, WITCH, FLOWERS, SUNGLASSES, BRAZIL_BANDANA
     val equippedSkin: String = "WHITE", // WHITE, GINGER, BLACK, SIAMESE, CALICO, TUXEDO, TABBY, SPOTTED_GRAY, SPOTTED_BROWN, etc.
     val equippedTheme: String = "DEFAULT", // DEFAULT, SAKURA, MINT_JARDIM, NIGHT_STARS
     val unlockedItems: String = "NONE,WHITE,DEFAULT" // Comma separated list of unlocked IDs
@@ -57,7 +57,8 @@ object RewardCatalog {
         ShopRewardItem("CAP", "Boné Descolado", RewardType.ACCESSORY, 100, "checkroom", "Gatinho radical e urbano"),
         ShopRewardItem("WITCH", "Chapéu Mágico", RewardType.ACCESSORY, 220, "auto_awesome", "Gatinho bruxinho cheio de magia"),
         ShopRewardItem("FLOWERS", "Coroa de Flores", RewardType.ACCESSORY, 120, "local_florist", "Primavera e cheirinho de flor"),
-        ShopRewardItem("SUNGLASSES", "Óculos Escuros Miau", RewardType.ACCESSORY, 140, "wb_sunny", "Miau estiloso demais para o sol")
+        ShopRewardItem("SUNGLASSES", "Óculos Escuros Miau", RewardType.ACCESSORY, 140, "wb_sunny", "Miau estiloso demais para o sol"),
+        ShopRewardItem("BRAZIL_BANDANA", "Bandana Brasil", RewardType.ACCESSORY, 160, "flag", "Uma bandana verde e amarela para torcer pelo Brasil")
     )
 
     val skins = listOf(
