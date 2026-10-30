@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -161,115 +162,135 @@ fun DailyMissionsScreen(
     val completedCount = missions.count { it.isCompleted }
     val progress = if (missions.isNotEmpty()) completedCount.toFloat() / missions.size else 0f
 
+    // Mantém a posição de rolagem da lista ao voltar da câmera.
+    val missionsListState = rememberLazyListState()
+
     Box(modifier = modifier.fillMaxSize().background(CatVanilla)) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 96.dp)
-        ) {
-            item {
-                HeaderBanner(
-                    catName = profile.name,
-                    dateStr = selectedDate,
-                    streak = streakDays,
-                    completed = completedCount,
-                    total = missions.size,
-                    progress = progress,
-                    fishCoins = profile.fishCoins,
-                    totalScore = profile.totalScore,
-                    level = profile.level,
-                    equippedSkin = profile.equippedSkin,
-                    equippedAccessory = profile.equippedAccessory,
-                    onOpenShop = onOpenShop,
-                    onOpenReminders = onOpenReminders
-                )
-            }
-
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "Missões Diárias de Cuidado",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = CatBrownText
-                            )
-                            Spacer(modifier = Modifier.width(6.dp))
-                            CartoonPawPrint(size = 18.dp)
-                        }
-                        Text(
-                            text = "Tire uma foto para comprovar cada missão!",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = CatBrownMuted
-                        )
-                    }
-                }
-            }
-
-            items(missions, key = { it.id }) { mission ->
-                MissionCardItem(
-                    mission = mission,
-                    onTakePhotoClick = {
-                        selectedMissionForPhoto = mission
-                        showPhotoOptionsDialog = true
-                    },
-                    onViewPhotoClick = { path ->
-                        previewPhotoPath = path
-                    },
-                    onUndoClick = {
-                        viewModel.undoMission(mission.id)
-                    },
-                    onDeleteClick = {
-                        viewModel.deleteMission(mission)
-                    }
-                )
-            }
-
-            if (missions.isEmpty()) {
+        // A câmera é o ÚNICO filho de layout da tela enquanto está aberta: nada pode
+        // ficar composto atrás dela. Dentro de um pager (layout "lazy"), composables
+        // irmãos são medidos/posicionados lado a lado — e a câmera, declarada como
+        // irmã da lista, era posicionada fora da tela, por isso não abria.
+        if (activeCameraMission != null) {
+            CatCameraScreen(
+                mission = activeCameraMission!!,
+                catName = profile.name,
+                onPhotoCaptured = { savedPath ->
+                    viewModel.completeMissionWithPhoto(activeCameraMission!!, savedPath)
+                    activeCameraMission = null
+                },
+                onClose = { activeCameraMission = null }
+            )
+        } else {
+            LazyColumn(
+                state = missionsListState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 96.dp)
+            ) {
                 item {
-                    Box(
+                    HeaderBanner(
+                        catName = profile.name,
+                        dateStr = selectedDate,
+                        streak = streakDays,
+                        completed = completedCount,
+                        total = missions.size,
+                        progress = progress,
+                        fishCoins = profile.fishCoins,
+                        totalScore = profile.totalScore,
+                        level = profile.level,
+                        equippedSkin = profile.equippedSkin,
+                        equippedAccessory = profile.equippedAccessory,
+                        onOpenShop = onOpenShop,
+                        onOpenReminders = onOpenReminders
+                    )
+                }
+
+                item {
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(40.dp),
-                        contentAlignment = Alignment.Center
+                            .padding(horizontal = 20.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CartoonCatFace(size = 90.dp)
-                            Spacer(modifier = Modifier.height(16.dp))
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "Missões Diárias de Cuidado",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = CatBrownText
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                CartoonPawPrint(size = 18.dp)
+                            }
                             Text(
-                                text = "Nenhuma missão para esta data!",
-                                fontWeight = FontWeight.Bold,
-                                color = CatBrownText
+                                text = "Tire uma foto para comprovar cada missão!",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = CatBrownMuted
                             )
                         }
                     }
                 }
-            }
-        }
 
-        FloatingActionButton(
-            onClick = { showAddDialog = true },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 16.dp, end = 20.dp)
-                .testTag("add_custom_mission_fab"),
-            containerColor = CatPeachPrimary,
-            contentColor = Color.White,
-            shape = CircleShape
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                items(missions, key = { it.id }) { mission ->
+                    MissionCardItem(
+                        mission = mission,
+                        onTakePhotoClick = {
+                            selectedMissionForPhoto = mission
+                            showPhotoOptionsDialog = true
+                        },
+                        onViewPhotoClick = { path ->
+                            previewPhotoPath = path
+                        },
+                        onUndoClick = {
+                            viewModel.undoMission(mission.id)
+                        },
+                        onDeleteClick = {
+                            viewModel.deleteMission(mission)
+                        }
+                    )
+                }
+
+                if (missions.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                CartoonCatFace(size = 90.dp)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Nenhuma missão para esta data!",
+                                    fontWeight = FontWeight.Bold,
+                                    color = CatBrownText
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            FloatingActionButton(
+                onClick = { showAddDialog = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 16.dp, end = 20.dp)
+                    .testTag("add_custom_mission_fab"),
+                containerColor = CatPeachPrimary,
+                contentColor = Color.White,
+                shape = CircleShape
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Nova Missão")
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Nova Missão", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Nova Missão")
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Nova Missão", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
             }
         }
     }
@@ -615,18 +636,6 @@ fun DailyMissionsScreen(
                 viewModel.addCustomMission(title, desc, cat)
                 showAddDialog = false
             }
-        )
-    }
-
-    if (activeCameraMission != null) {
-        CatCameraScreen(
-            mission = activeCameraMission!!,
-            catName = profile.name,
-            onPhotoCaptured = { savedPath ->
-                viewModel.completeMissionWithPhoto(activeCameraMission!!, savedPath)
-                activeCameraMission = null
-            },
-            onClose = { activeCameraMission = null }
         )
     }
 }
