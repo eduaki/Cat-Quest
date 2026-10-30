@@ -17,6 +17,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Audiotrack
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -36,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -94,20 +97,41 @@ fun MainContent(viewModel: CatCareViewModel) {
     var currentScreen by remember { mutableStateOf(AppScreen.MISSIONS) }
     var hideBottomBar by remember { mutableStateOf(false) }
 
-    // Retorna para a tela de missões ao apertar voltar
-    if (currentScreen != AppScreen.MISSIONS) {
-        BackHandler {
-            currentScreen = AppScreen.MISSIONS
+    val bottomTabs = remember {
+        listOf(
+            AppScreen.MISSIONS,
+            AppScreen.CALENDAR,
+            AppScreen.CAROUSEL,
+            AppScreen.MURAL,
+            AppScreen.REWARDS
+        )
+    }
+
+    val pagerState = rememberPagerState(pageCount = { bottomTabs.size })
+
+    // Mantém o item do menu sincronizado com a página alcançada ao arrastar.
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            val screen = bottomTabs.getOrNull(page) ?: return@collect
+            if (currentScreen != screen) currentScreen = screen
         }
     }
 
-    val bottomTabs = listOf(
-        AppScreen.MISSIONS,
-        AppScreen.CALENDAR,
-        AppScreen.CAROUSEL,
-        AppScreen.MURAL,
-        AppScreen.REWARDS
-    )
+    // Troca de seção pelo menu ou por atalhos internos, posicionando o pager na página certa.
+    fun navigateTo(screen: AppScreen) {
+        currentScreen = screen
+
+        val page = bottomTabs.indexOf(screen)
+        // "Lembretes" não é uma página do pager.
+        if (page >= 0) pagerState.requestScrollToPage(page)
+    }
+
+    // Retorna para a tela de missões ao apertar voltar
+    if (currentScreen != AppScreen.MISSIONS) {
+        BackHandler {
+            navigateTo(AppScreen.MISSIONS)
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -126,7 +150,7 @@ fun MainContent(viewModel: CatCareViewModel) {
                         val isSelected = currentScreen == screen
                         NavigationBarItem(
                             selected = isSelected,
-                            onClick = { currentScreen = screen },
+                            onClick = { navigateTo(screen) },
                             icon = {
                                 Icon(
                                     imageVector = screen.icon,
@@ -156,60 +180,59 @@ fun MainContent(viewModel: CatCareViewModel) {
         }
     ) { innerPadding ->
         // Quando a barra está escondida, o padding inferior deve ser zero para a câmera ser full screen
-        val screenModifier = Modifier.padding(innerPadding)
+        val contentModifier = Modifier.padding(innerPadding)
 
-        when (currentScreen) {
-            AppScreen.MISSIONS -> {
-                DailyMissionsScreen(
-                    viewModel = viewModel,
-                    onOpenShop = { currentScreen = AppScreen.REWARDS },
-                    onOpenReminders = { currentScreen = AppScreen.SETTINGS },
-                    onCameraStateChanged = { hideBottomBar = it },
-                    modifier = screenModifier
-                )
-            }
-            AppScreen.CALENDAR -> {
-                CalendarScreen(
-                    viewModel = viewModel,
-                    onNavigateToCarousel = { currentScreen = AppScreen.CAROUSEL },
-                    modifier = screenModifier
-                )
-            }
-            AppScreen.CAROUSEL -> {
-                MonthRecapCarouselScreen(
-                    viewModel = viewModel,
-                    onNavigateToMural = { currentScreen = AppScreen.MURAL },
-                    onNavigateToMissions = { currentScreen = AppScreen.MISSIONS },
-                    modifier = screenModifier
-                )
-            }
-            AppScreen.MURAL -> {
-                PhotoMuralScreen(
-                    viewModel = viewModel,
-                    onNavigateToMissions = { currentScreen = AppScreen.MISSIONS },
-                    modifier = screenModifier
-                )
-            }
-            AppScreen.REWARDS -> {
-                RewardsShopShopScreen(
-                    viewModel = viewModel,
-                    modifier = screenModifier
-                )
-            }
-            AppScreen.SETTINGS -> {
-                RemindersSettingsScreen(
-                    viewModel = viewModel,
-                    modifier = screenModifier
-                )
+        if (currentScreen == AppScreen.SETTINGS) {
+            // "Lembretes" não é uma aba do menu inferior, então fica fora do pager.
+            RemindersSettingsScreen(
+                viewModel = viewModel,
+                modifier = contentModifier
+            )
+        } else {
+            HorizontalPager(
+                state = pagerState,
+                modifier = contentModifier
+                    .fillMaxSize()
+                    .testTag("section_pager"),
+                // A câmera ocupa a tela toda, então o arrasto fica desativado com ela aberta.
+                userScrollEnabled = !hideBottomBar
+            ) { page ->
+                val pageModifier = Modifier.fillMaxSize()
+
+                when (bottomTabs[page]) {
+                    AppScreen.MISSIONS -> DailyMissionsScreen(
+                        viewModel = viewModel,
+                        onOpenShop = { navigateTo(AppScreen.REWARDS) },
+                        onOpenReminders = { navigateTo(AppScreen.SETTINGS) },
+                        onCameraStateChanged = { hideBottomBar = it },
+                        modifier = pageModifier
+                    )
+                    AppScreen.CALENDAR -> CalendarScreen(
+                        viewModel = viewModel,
+                        onNavigateToCarousel = { navigateTo(AppScreen.CAROUSEL) },
+                        modifier = pageModifier
+                    )
+                    AppScreen.CAROUSEL -> MonthRecapCarouselScreen(
+                        viewModel = viewModel,
+                        onNavigateToMural = { navigateTo(AppScreen.MURAL) },
+                        onNavigateToMissions = { navigateTo(AppScreen.MISSIONS) },
+                        modifier = pageModifier
+                    )
+                    AppScreen.MURAL -> PhotoMuralScreen(
+                        viewModel = viewModel,
+                        onNavigateToMissions = { navigateTo(AppScreen.MISSIONS) },
+                        modifier = pageModifier
+                    )
+                    AppScreen.REWARDS -> RewardsShopScreen(
+                        viewModel = viewModel,
+                        modifier = pageModifier
+                    )
+                    // SETTINGS é renderizado acima, fora do pager.
+                    AppScreen.SETTINGS -> Unit
+                }
             }
         }
     }
-}
-
-// Pequeno hack caso o nome da classe tenha mudado no seu projeto
-@Composable
-fun RewardsShopShopScreen(viewModel: CatCareViewModel, modifier: Modifier) {
-    RewardsShopScreen(viewModel, modifier)
 }
 
 /**
