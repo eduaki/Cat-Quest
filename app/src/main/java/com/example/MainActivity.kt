@@ -179,8 +179,9 @@ fun MainContent(viewModel: CatCareViewModel) {
             }
         }
     ) { innerPadding ->
-        // Quando a barra está escondida, o padding inferior deve ser zero para a câmera ser full screen
-        val contentModifier = Modifier.padding(innerPadding)
+        // Com a câmera aberta a barra inferior some e o conteúdo vai de borda a borda,
+        // para o preview ocupar a tela toda (antes sobrava uma faixa de fundo embaixo).
+        val contentModifier = if (hideBottomBar) Modifier else Modifier.padding(innerPadding)
 
         if (currentScreen == AppScreen.SETTINGS) {
             // "Lembretes" não é uma aba do menu inferior, então fica fora do pager.
