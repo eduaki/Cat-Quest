@@ -376,13 +376,13 @@ object CatNotificationHelper {
     fun getFormattedActiveSchedules(config: ReminderConfig): List<Pair<String, String>> {
         val list = mutableListOf<Pair<String, String>>()
         if (config.morningEnabled) {
-            list.add(Pair("Manhã 🌅", String.format(Locale.getDefault(), "%02d:%02d", config.morningHour, config.morningMinute)))
+            list.add(Pair("Manhã", String.format(Locale.getDefault(), "%02d:%02d", config.morningHour, config.morningMinute)))
         }
         if (config.afternoonEnabled) {
-            list.add(Pair("Tarde ☀️", String.format(Locale.getDefault(), "%02d:%02d", config.afternoonHour, config.afternoonMinute)))
+            list.add(Pair("Tarde", String.format(Locale.getDefault(), "%02d:%02d", config.afternoonHour, config.afternoonMinute)))
         }
         if (config.eveningEnabled) {
-            list.add(Pair("Noite 🌙", String.format(Locale.getDefault(), "%02d:%02d", config.eveningHour, config.eveningMinute)))
+            list.add(Pair("Noite", String.format(Locale.getDefault(), "%02d:%02d", config.eveningHour, config.eveningMinute)))
         }
         return list
     }

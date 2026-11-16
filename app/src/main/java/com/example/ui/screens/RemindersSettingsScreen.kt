@@ -251,30 +251,6 @@ fun RemindersSettingsScreen(
                                 color = CatBrownText
                             )
                         }
-
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = if (activeSchedules.isNotEmpty()) CatMint.copy(alpha = 0.2f) else Color(0xFFFFECE0)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = if (activeSchedules.isNotEmpty()) Icons.Default.AccessTime else Icons.Default.Notifications,
-                                    contentDescription = null,
-                                    tint = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = if (activeSchedules.isNotEmpty()) "${activeSchedules.size} Ativos" else "Inativo",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (activeSchedules.isNotEmpty()) CatMint else CatPeachPrimary
-                                )
-                            }
-                        }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -361,14 +337,14 @@ fun RemindersSettingsScreen(
                     }
                     Text(
                         text = "Personalize o jeitinho que o gato fala com você:",
-                        fontSize = 12.sp,
+                        fontSize = 10.sp,
                         color = CatBrownMuted,
                         modifier = Modifier.padding(top = 2.dp, bottom = 10.dp)
                     )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         val tones = listOf(
                             Triple("CARINHOSO", "Carinhoso", Icons.Default.Favorite),

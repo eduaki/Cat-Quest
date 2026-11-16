@@ -227,7 +227,7 @@ fun CatAffectionNotificationManagerSection(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     val intervals = listOf(
                         Pair(2, "A cada 2h"),
@@ -252,7 +252,6 @@ fun CatAffectionNotificationManagerSection(
                             label = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     if (hours == 4) {
-                                        Icon(Icons.Default.Star, contentDescription = null, modifier = Modifier.size(12.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
                                     }
                                     Text(label, fontSize = 10.sp)

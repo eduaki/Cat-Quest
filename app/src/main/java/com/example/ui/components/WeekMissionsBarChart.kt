@@ -119,24 +119,6 @@ fun WeekMissionsBarChart(
                         )
                     }
                 }
-
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = if (showD3WebViewMode) CatPeachPrimary else CatPeachLight.copy(alpha = 0.4f),
-                    modifier = Modifier.clickable { showD3WebViewMode = !showD3WebViewMode }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = if (showD3WebViewMode) "D3.js SVG" else "Native Chart",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (showD3WebViewMode) Color.White else CatPeachPrimary
-                        )
-                    }
-                }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
