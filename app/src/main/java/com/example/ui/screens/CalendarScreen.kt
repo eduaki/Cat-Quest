@@ -299,6 +299,7 @@ private fun CalendarMonthGrid(
     onDayClick: (String) -> Unit
 ) {
     val rows = days.chunked(7)
+
     Column(modifier = Modifier.fillMaxWidth()) {
         rows.forEach { week ->
             Row(
@@ -343,7 +344,8 @@ private fun CalendarMonthGrid(
                                     Text(
                                         text = "${day.dayNumber}",
                                         fontSize = 13.sp,
-                                        fontWeight = if (isSelected || isToday || hasCompleted) FontWeight.Bold else FontWeight.Normal,
+                                        fontWeight = if (isSelected || isToday || hasCompleted)
+                                            FontWeight.Bold else FontWeight.Normal,
                                         color = when {
                                             isSelected -> Color.White
                                             hasCompleted -> CatBrownText
@@ -351,6 +353,7 @@ private fun CalendarMonthGrid(
                                             else -> CatBrownText
                                         }
                                     )
+
                                     if (hasCompleted) {
                                         CartoonPawPrint(
                                             size = 10.dp,
@@ -361,6 +364,15 @@ private fun CalendarMonthGrid(
                             }
                         }
                     }
+                }
+
+                repeat(7 - week.size) {
+                    Spacer(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(2.dp)
+                            .aspectRatio(1f)
+                    )
                 }
             }
         }
